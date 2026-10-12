@@ -306,6 +306,128 @@
       box-shadow: none !important;
     }
 
+    .bot-panel {
+      margin-top: 14px;
+      padding: 12px;
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      border-radius: 10px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(22, 101, 52, 0.08);
+      animation: fadeIn 0.25s ease;
+    }
+
+    .bot-panel.active {
+      display: flex;
+    }
+
+    .bot-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bot-title {
+      font-weight: 800;
+      font-size: 14px;
+      color: #166534;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bot-badge-thinking {
+      background: #fef08a;
+      color: #854d0e;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #facc15;
+      animation: pulseThinking 1.2s infinite;
+    }
+
+    @keyframes pulseThinking {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(0.97); }
+    }
+
+    .bot-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .bot-form-group label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .bot-select {
+      width: 100%;
+      height: 35px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 0 8px;
+      font-size: 13px;
+      font-weight: 600;
+      background: #ffffff;
+      color: #0f172a;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .bot-select:focus {
+      border-color: #059669;
+    }
+
+    .bot-actions-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn-bot-action {
+      min-height: 36px;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 0 6px;
+    }
+
+    .btn-bot-action:hover:not(:disabled) {
+      background: #047857;
+      transform: translateY(-1px);
+    }
+
+    .btn-bot-action.secondary {
+      background: #ffffff;
+      color: #334155;
+      border: 1.5px solid #cbd5e1;
+      box-shadow: none;
+    }
+
+    .btn-bot-action.secondary:hover:not(:disabled) {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
     .status-list {
       display: grid;
       gap: 9px;
@@ -987,10 +1109,57 @@
           <h2>Phòng đấu</h2>
           <div class="controls">
             <button id="btnCreate" class="btn-primary">Tạo phòng Online (2 người)</button>
-            <button id="btnSolo" class="btn-solo">Luyện tập (1 máy / 2 bên)</button>
+            <button id="btnSolo" class="btn-solo">Luyện tập & Đấu với Bot</button>
             <input id="roomInput" type="text" inputmode="numeric" maxlength="6" placeholder="Nhập mã phòng 6 số">
             <button id="btnJoin" class="btn-secondary">Vào phòng</button>
             <button id="btnRestart" class="btn-restart" disabled>Chơi lại ván mới</button>
+          </div>
+
+          <!-- Panel Cấu hình Bot & Luyện tập -->
+          <div id="botControlPanel" class="bot-panel">
+            <div class="bot-panel-header">
+              <span class="bot-title">🤖 Luyện tập với Bot AI</span>
+              <span id="botThinkingBadge" class="bot-badge-thinking" style="display: none;">Bot đang tính...</span>
+            </div>
+
+            <div class="bot-form-group">
+              <label for="practiceModeSelect">Chế độ chơi:</label>
+              <select id="practiceModeSelect" class="bot-select">
+                <option value="human_vs_bot_red">👤 Bạn (Đỏ) vs 🤖 Bot (Đen)</option>
+                <option value="bot_vs_human_black">🤖 Bot (Đỏ) vs 👤 Bạn (Đen)</option>
+                <option value="bot_vs_bot">🤖 Bot vs 🤖 Bot (Tự chơi 2 bên)</option>
+                <option value="human_vs_human">👥 Tự luyện 2 bên (Người tự đi)</option>
+              </select>
+            </div>
+
+            <div class="bot-form-group">
+              <label for="botDifficultySelect">Độ khó của Bot:</label>
+              <select id="botDifficultySelect" class="bot-select">
+                <option value="1">Cấp 1 - Dễ (Tập sự · Depth 2)</option>
+                <option value="2">Cấp 2 - Trung bình (Phong trào · Depth 3)</option>
+                <option value="3" selected>Cấp 3 - Khá (Cao thủ · Depth 4)</option>
+                <option value="4">Cấp 4 - Khó (Kiện tướng · Depth 5)</option>
+                <option value="5">Cấp 5 - Cực khó (Đại kiện tướng · Depth 6)</option>
+              </select>
+            </div>
+
+            <div class="bot-form-group">
+              <label for="botSpeedSelect">Tốc độ Bot đi cờ:</label>
+              <select id="botSpeedSelect" class="bot-select">
+                <option value="400">Nhanh (0.4 giây)</option>
+                <option value="800" selected>Vừa (0.8 giây)</option>
+                <option value="1500">Chậm (1.5 giây)</option>
+              </select>
+            </div>
+
+            <div class="bot-actions-row">
+              <button id="btnBotHint" type="button" class="btn-bot-action" title="Nhờ Bot tính toán và đi ngay một nước tối ưu">
+                💡 Bot đi hộ 1 nước
+              </button>
+              <button id="btnBotPauseToggle" type="button" class="btn-bot-action secondary" title="Tạm dừng hoặc tiếp tục chế độ tự động chơi">
+                ⏸️ Tạm dừng
+              </button>
+            </div>
           </div>
 
           <div class="status-list">
@@ -1272,6 +1441,7 @@
 
   <div id="toast" class="toast">Đã sao chép mã phòng!</div>
 
+  <script src="/wukong.js"></script>
   <script>
     const BOARD_COLS = 9;
     const BOARD_ROWS = 10;
@@ -1345,6 +1515,15 @@
     const coordRight = document.getElementById("coordRight");
     const toast = document.getElementById("toast");
 
+    // Bot AI & Practice Mode DOM Elements
+    const botControlPanel = document.getElementById("botControlPanel");
+    const practiceModeSelect = document.getElementById("practiceModeSelect");
+    const botDifficultySelect = document.getElementById("botDifficultySelect");
+    const botSpeedSelect = document.getElementById("botSpeedSelect");
+    const botThinkingBadge = document.getElementById("botThinkingBadge");
+    const btnBotHint = document.getElementById("btnBotHint");
+    const btnBotPauseToggle = document.getElementById("btnBotPauseToggle");
+
     // Game state
     let socket = null;
     let state = null;
@@ -1355,6 +1534,16 @@
     let useHanFont = true;
     let soundEnabled = true;
     let shownResultFen = null;
+
+    // Bot AI state (Wukong Xiangqi Library)
+    let wukongEngine = null;
+    let practiceMode = "human_vs_bot_red";
+    let botDifficulty = 3;
+    let botSpeed = 800;
+    let botAutoPlay = true;
+    let isBotThinking = false;
+    let botTimer = null;
+    const DIFFICULTY_DEPTHS = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6 };
 
     // Web Audio Synthesizer for wooden click
     let audioCtx = null;
@@ -1453,6 +1642,166 @@
       renderBoard();
     });
 
+    // Bot AI Event Listeners
+    practiceModeSelect.addEventListener("change", (e) => {
+      practiceMode = e.target.value;
+      if (practiceMode === "bot_vs_human_black") {
+        manualFlip = false;
+        currentView = "black";
+      } else {
+        manualFlip = false;
+        currentView = "red";
+      }
+      ensureBoardOrientation();
+      renderBoard();
+      updatePlayers();
+      updateMessage();
+      scheduleBotMoveIfNeeded();
+    });
+
+    botDifficultySelect.addEventListener("change", (e) => {
+      botDifficulty = parseInt(e.target.value, 10) || 3;
+      const optText = botDifficultySelect.options[botDifficultySelect.selectedIndex]?.text || "";
+      showToast(`Đã chọn: ${optText}`);
+      updatePlayers();
+    });
+
+    botSpeedSelect.addEventListener("change", (e) => {
+      botSpeed = parseInt(e.target.value, 10) || 800;
+      showToast(`Tốc độ Bot: ${botSpeed}ms`);
+    });
+
+    btnBotHint.addEventListener("click", () => {
+      if (myMark !== "both" || !state || state.status !== "playing") {
+        showToast("Tính năng này chỉ khả dụng khi đang ở chế độ Luyện tập!");
+        return;
+      }
+      if (isBotThinking) return;
+      showToast("Bot đang tính nước cờ tối ưu...");
+      executeBotMove();
+    });
+
+    btnBotPauseToggle.addEventListener("click", () => {
+      botAutoPlay = !botAutoPlay;
+      btnBotPauseToggle.textContent = botAutoPlay ? "⏸️ Tạm dừng" : "▶️ Tiếp tục";
+      showToast(botAutoPlay ? "Đã bật tự động chơi" : "Đã tạm dừng Bot tự chơi");
+      if (botAutoPlay) {
+        scheduleBotMoveIfNeeded();
+      } else {
+        if (botTimer) {
+          clearTimeout(botTimer);
+          botTimer = null;
+        }
+        updateBotThinkingUI(false);
+      }
+    });
+
+    // Bot Engine Functions (Wukong Xiangqi)
+    function initWukong() {
+      if (!wukongEngine && typeof Engine !== "undefined") {
+        try {
+          wukongEngine = new Engine();
+        } catch (e) {
+          console.warn("Lỗi khởi tạo Wukong:", e);
+        }
+      }
+    }
+
+    function squareToWukong(sq) {
+      if (!sq || sq.length < 2) return sq;
+      const file = sq[0];
+      const rank = parseInt(sq.slice(1), 10);
+      return `${file}${rank - 1}`;
+    }
+
+    function wukongToSquare(wsq) {
+      if (!wsq || wsq.length < 2) return wsq;
+      const file = wsq[0];
+      const rank = parseInt(wsq.slice(1), 10);
+      return `${file}${rank + 1}`;
+    }
+
+    function parseWukongMove(moveStr) {
+      if (!moveStr || moveStr.length < 4) return null;
+      return {
+        from: wukongToSquare(moveStr.slice(0, 2)),
+        to: wukongToSquare(moveStr.slice(2, 4))
+      };
+    }
+
+    function isBotTurn() {
+      if (myMark !== "both" || !state || state.status !== "playing") return false;
+      if (practiceMode === "human_vs_bot_red" && state.turn === "black") return true;
+      if (practiceMode === "bot_vs_human_black" && state.turn === "red") return true;
+      if (practiceMode === "bot_vs_bot") return true;
+      return false;
+    }
+
+    function updateBotThinkingUI(thinking) {
+      isBotThinking = thinking;
+      if (botThinkingBadge) {
+        botThinkingBadge.style.display = thinking ? "inline-block" : "none";
+      }
+    }
+
+    function scheduleBotMoveIfNeeded() {
+      if (botTimer) {
+        clearTimeout(botTimer);
+        botTimer = null;
+      }
+      if (myMark !== "both" || !state || state.status !== "playing") {
+        updateBotThinkingUI(false);
+        return;
+      }
+      if (!botAutoPlay || !isBotTurn()) {
+        updateBotThinkingUI(false);
+        return;
+      }
+
+      updateBotThinkingUI(true);
+      botTimer = setTimeout(() => {
+        executeBotMove();
+      }, botSpeed);
+    }
+
+    function executeBotMove() {
+      if (!state || state.status !== "playing") {
+        updateBotThinkingUI(false);
+        return;
+      }
+
+      initWukong();
+      if (!wukongEngine) {
+        showToast("Lỗi: Không tìm thấy thư viện Wukong engine.");
+        updateBotThinkingUI(false);
+        return;
+      }
+
+      try {
+        updateBotThinkingUI(true);
+        wukongEngine.setBoard(state.fen);
+        const depth = DIFFICULTY_DEPTHS[botDifficulty] || 4;
+        const bestMove = wukongEngine.search(depth);
+        const moveStr = wukongEngine.moveToString(bestMove);
+
+        if (moveStr && moveStr.length === 4 && moveStr !== "0000") {
+          const uciMove = parseWukongMove(moveStr);
+          if (uciMove) {
+            send({
+              type: "move",
+              from: uciMove.from,
+              to: uciMove.to
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Lỗi khi Bot tính nước cờ:", err);
+      } finally {
+        updateBotThinkingUI(false);
+      }
+    }
+
+
     function showToast(text) {
       toast.textContent = text;
       toast.classList.add("show");
@@ -1480,6 +1829,11 @@
         statusDot.className = "status-dot error";
         messageBox.textContent = "Mất kết nối tới server. Vui lòng tải lại trang.";
         updateTurnBanner("Mất kết nối", "Tải lại trang để kết nối lại server.", "warning");
+        if (botTimer) {
+          clearTimeout(botTimer);
+          botTimer = null;
+        }
+        updateBotThinkingUI(false);
         setRoomControls(false);
       });
     }
@@ -1488,13 +1842,18 @@
       if (data.type === "room_created" || data.type === "joined") {
         myMark = data.mark;
         if (data.mark === "both") {
-          messageBox.textContent = "Đã tạo chế độ luyện tập 2 bên trên cùng máy. Bên Đỏ đi trước!";
-        } else if (data.mark === "viewer") {
-          messageBox.textContent = "Phòng đã đủ 2 người chơi. Bạn đang theo dõi với tư cách khán giả.";
+          messageBox.textContent = "Chế độ Luyện tập đã sẵn sàng. Bot AI sẽ tự động tính nước cờ theo cài đặt của bạn!";
+          botControlPanel.classList.add("active");
+          initWukong();
         } else {
-          messageBox.textContent = data.type === "room_created"
-            ? "Đã tạo phòng. Gửi mã phòng cho đối thủ để bắt đầu!"
-            : "Đã vào phòng. Trận đấu bắt đầu!";
+          botControlPanel.classList.remove("active");
+          if (data.mark === "viewer") {
+            messageBox.textContent = "Phòng đã đủ 2 người chơi. Bạn đang theo dõi với tư cách khán giả.";
+          } else {
+            messageBox.textContent = data.type === "room_created"
+              ? "Đã tạo phòng. Gửi mã phòng cho đối thủ để bắt đầu!"
+              : "Đã vào phòng. Trận đấu bắt đầu!";
+          }
         }
         setRoomControls(true);
         ensureBoardOrientation();
@@ -1545,6 +1904,11 @@
     }
 
     function restartGame() {
+      if (botTimer) {
+        clearTimeout(botTimer);
+        botTimer = null;
+      }
+      updateBotThinkingUI(false);
       resultModal.classList.remove("open");
       shownResultFen = null;
       send({ type: "restart" });
@@ -1560,6 +1924,9 @@
 
     function ensureBoardOrientation() {
       let targetView = myMark === "black" ? "black" : "red";
+      if (myMark === "both") {
+        targetView = practiceMode === "bot_vs_human_black" ? "black" : "red";
+      }
       if (manualFlip) {
         targetView = targetView === "red" ? "black" : "red";
       }
@@ -1627,7 +1994,7 @@
         ? `${playerCount}/2 · ${viewerCount} khán giả`
         : `${playerCount}/2`;
 
-      btnRestart.disabled = state.status !== "finished" || myMark === "viewer";
+      btnRestart.disabled = (myMark !== "both" && state.status !== "finished") || myMark === "viewer";
 
       updatePlayers();
       updateMessage();
@@ -1635,6 +2002,7 @@
       updateCapturedPieces();
       updateHistoryTable();
       maybeShowResultModal();
+      scheduleBotMoveIfNeeded();
     }
 
     function updatePlayers() {
@@ -1690,8 +2058,14 @@
 
       checkAlert.style.display = "none";
       if (myMark === "both") {
-        updateTurnBanner(`Luyện tập: Đến lượt bên ${colorLabel(state.turn)}`, `Chọn quân ${colorLabel(state.turn)} để thực hiện nước đi.`, "my-turn");
-        messageBox.textContent = `Chế độ 2 bên: Đến lượt bên ${colorLabel(state.turn)}.`;
+        const diffText = botDifficultySelect.options[botDifficultySelect.selectedIndex]?.text.split("(")[0].trim() || `Cấp ${botDifficulty}`;
+        if (isBotTurn()) {
+          updateTurnBanner(`🤖 Bot đang tính nước cờ (${diffText})...`, `Bot AI đang tính toán nước đi cho bên ${colorLabel(state.turn)}...`, "");
+          messageBox.textContent = `🤖 Bot đang tính nước cờ cho bên ${colorLabel(state.turn)} (${diffText})...`;
+        } else {
+          updateTurnBanner("Đến lượt bạn", `Bạn cầm quân ${colorLabel(state.turn)}. Hãy chọn quân và đi tiếp.`, "my-turn");
+          messageBox.textContent = `Đến lượt bạn đi quân ${colorLabel(state.turn)}.`;
+        }
       } else if (state.turn === myMark) {
         updateTurnBanner("Đến lượt bạn", `Bạn cầm quân ${colorLabel(myMark)}. Hãy chọn quân và đi tiếp.`, "my-turn");
         messageBox.textContent = "Đến lượt bạn đi nước tiếp theo.";
@@ -1806,11 +2180,12 @@
     }
 
     function canInteractWithBoard() {
-      return Boolean(
-        state &&
-        state.status === "playing" &&
-        (myMark === "both" || (myMark !== "viewer" && state.turn === myMark))
-      );
+      if (!state || state.status !== "playing") return false;
+      if (myMark === "both") {
+        if (isBotTurn() || isBotThinking) return false;
+        return true;
+      }
+      return myMark !== "viewer" && state.turn === myMark;
     }
 
     function pieceAt(square) {
@@ -1961,8 +2336,20 @@
     }
 
     function playerDescription(color) {
-      if (myMark === "both") return color === "red" ? "Người chơi Đỏ" : "Người chơi Đen";
-      if (myMark === "viewer") return "Người chơi";
+      if (myMark === "both") {
+        const diffText = botDifficultySelect.options[botDifficultySelect.selectedIndex]?.text.split("(")[0].trim() || `Cấp ${botDifficulty}`;
+        if (practiceMode === "human_vs_bot_red") {
+          return color === "red" ? "Bạn (Người chơi)" : `🤖 Bot AI (${diffText})`;
+        }
+        if (practiceMode === "bot_vs_human_black") {
+          return color === "black" ? "Bạn (Người chơi)" : `🤖 Bot AI (${diffText})`;
+        }
+        if (practiceMode === "bot_vs_bot") {
+          return `🤖 Bot AI (${diffText})`;
+        }
+        return color === "red" ? "Người chơi Đỏ" : "Người chơi Đen";
+      }
+      if (myMark === "viewer") return "Khán giả";
       return color === myMark ? "Bạn" : "Đối thủ";
     }
 
@@ -1971,6 +2358,10 @@
       btnSolo.disabled = inRoom;
       btnJoin.disabled = inRoom;
       roomInput.disabled = inRoom;
+      if (!inRoom) {
+        botControlPanel.classList.remove("active");
+        btnRestart.disabled = true;
+      }
     }
 
     function colorLabel(color) {
