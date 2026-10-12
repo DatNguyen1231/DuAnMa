@@ -1,0 +1,32 @@
+[
+  {
+    "question": "HTML là viết tắt của gì?",
+    "answers": [
+      "Hyper Text Markup Language",
+      "High Text Machine Language",
+      "Hyper Tool Multi Language",
+      "Home Tool Markup Language"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "CSS dùng để làm gì?",
+    "answers": [
+      "Tạo cơ sở dữ liệu",
+      "Trang trí giao diện web",
+      "Xử lý server",
+      "Tạo file JSON"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "JavaScript chạy ở đâu?",
+    "answers": [
+      "Chỉ chạy trong Word",
+      "Chỉ chạy trong Excel",
+      "Trình duyệt web",
+      "Máy in"
+    ],
+    "correct": 2
+  }
+]

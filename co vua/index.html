@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cờ Vua Online</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: #18202a;
+      background:
+        linear-gradient(135deg, rgba(15, 118, 110, 0.16), transparent 38%),
+        linear-gradient(315deg, rgba(202, 138, 4, 0.16), transparent 34%),
+        #eef2f6;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1240px, calc(100vw - 24px));
+      margin: 0 auto;
+      padding: 22px 0;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 900;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: #5e6672;
+      font-size: 15px;
+    }
+
+    .connection {
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid #d1d8e0;
+      font-size: 14px;
+      white-space: nowrap;
+      box-shadow: 0 6px 18px rgba(20, 31, 44, 0.07);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(380px, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid #d1d8e0;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 10px 28px rgba(20, 31, 44, 0.08);
+    }
+
+    .panel + .panel {
+      margin-top: 16px;
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+    }
+
+    input {
+      width: 100%;
+      height: 40px;
+      border: 1px solid #c3ccd7;
+      border-radius: 6px;
+      padding: 0 10px;
+      font-size: 16px;
+      background: #ffffff;
+    }
+
+    button {
+      min-height: 40px;
+      border: 0;
+      border-radius: 6px;
+      background: #0f766e;
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #2f3a47;
+    }
+
+    button.ghost {
+      background: #eef2f6;
+      color: #18202a;
+      border: 1px solid #c3ccd7;
+    }
+
+    button:disabled {
+      background: #aeb7c2;
+      cursor: not-allowed;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 9px;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #edf1f5;
+      padding-bottom: 8px;
+    }
+
+    .status-row span:first-child {
+      color: #66707d;
+    }
+
+    .room-code {
+      font-size: 24px;
+      font-weight: 900;
+      color: #0f766e;
+      letter-spacing: 0;
+    }
+
+    .player-card {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 62px;
+      border: 1px solid #d8dee7;
+      border-radius: 8px;
+      padding: 10px;
+      background: #f8fafc;
+    }
+
+    .player-card + .player-card {
+      margin-top: 10px;
+    }
+
+    .player-card.active {
+      border-color: #0f766e;
+      box-shadow: inset 4px 0 0 #0f766e;
+    }
+
+    .player-piece {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid #d8dee7;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .player-name {
+      font-weight: 900;
+    }
+
+    .player-meta {
+      margin-top: 3px;
+      color: #66707d;
+      font-size: 13px;
+    }
+
+    .badge {
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #e8f5f3;
+      color: #0f766e;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .badge.waiting {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .turn-banner {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      padding: 14px 16px;
+      background: #10202b;
+      color: #ffffff;
+      box-shadow: 0 12px 26px rgba(16, 32, 43, 0.18);
+    }
+
+    .turn-banner.my-turn {
+      background: #0f766e;
+    }
+
+    .turn-banner.warning {
+      background: #b45309;
+    }
+
+    .turn-banner.finished {
+      background: #2f3a47;
+    }
+
+    .turn-title {
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .turn-detail {
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .board-wrap {
+      position: relative;
+      overflow: auto;
+      background: #ffffff;
+      border: 1px solid #d1d8e0;
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 14px 32px rgba(20, 31, 44, 0.1);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 68px);
+      grid-template-rows: repeat(8, 68px);
+      width: 544px;
+      height: 544px;
+      border: 2px solid #202936;
+      background: #d7b27c;
+    }
+
+    .cell {
+      width: 68px;
+      height: 68px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      display: grid;
+      place-items: center;
+      position: relative;
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      color: #111827;
+      user-select: none;
+    }
+
+    .cell.light {
+      background: #f0d9b5;
+    }
+
+    .cell.dark {
+      background: #b58863;
+    }
+
+    .cell.white-piece {
+      color: #f8fafc;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
+    }
+
+    .cell.black-piece {
+      color: #111827;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.35);
+    }
+
+    .cell.selected {
+      outline: 4px solid #facc15;
+      outline-offset: -4px;
+    }
+
+    .cell.last-move {
+      box-shadow: inset 0 0 0 999px rgba(250, 204, 21, 0.32);
+    }
+
+    .cell.legal::after {
+      content: "";
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(31, 41, 55, 0.42);
+      position: absolute;
+    }
+
+    .cell.capture::after {
+      content: "";
+      width: 52px;
+      height: 52px;
+      border: 4px solid rgba(220, 38, 38, 0.56);
+      border-radius: 50%;
+      background: transparent;
+      position: absolute;
+    }
+
+    .cell.disabled {
+      cursor: default;
+    }
+
+    .message {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 6px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .promotion-backdrop,
+    .result-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 10;
+    }
+
+    .promotion-backdrop.open,
+    .result-backdrop.open {
+      display: flex;
+    }
+
+    .dialog {
+      width: min(380px, calc(100vw - 32px));
+      background: #ffffff;
+      border: 1px solid #d5dae1;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.24);
+    }
+
+    .dialog h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .dialog p {
+      margin: 0 0 14px;
+      color: #5e6672;
+      line-height: 1.5;
+    }
+
+    .dialog-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .promotion-options {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .promotion-options button {
+      height: 58px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #111827;
+      font-size: 34px;
+    }
+
+    @media (max-width: 1080px) {
+      .layout {
+        grid-template-columns: 300px 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        width: min(100vw - 14px, 460px);
+        padding: 12px 0;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .board {
+        grid-template-columns: repeat(8, 42px);
+        grid-template-rows: repeat(8, 42px);
+        width: 336px;
+        height: 336px;
+      }
+
+      .cell {
+        width: 42px;
+        height: 42px;
+        font-size: 29px;
+      }
+
+      .cell.capture::after {
+        width: 32px;
+        height: 32px;
+      }
+
+      .dialog-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>Cờ Vua Online</h1>
+        <p class="subtitle">Phòng đấu realtime, luật cờ vua được kiểm tra trên server.</p>
+      </div>
+      <div id="connectionStatus" class="connection">Đang kết nối...</div>
+    </header>
+
+    <section class="layout">
+      <aside class="left-column">
+        <section class="panel">
+          <h2>Phòng chơi</h2>
+          <div class="controls">
+            <button id="btnCreate">Tạo phòng mới</button>
+            <input id="roomInput" type="text" inputmode="numeric" maxlength="6" placeholder="Nhập mã phòng">
+            <button id="btnJoin" class="secondary">Vào phòng</button>
+            <button id="btnRestart" disabled>Chơi lại</button>
+          </div>
+
+          <div class="status-list">
+            <div class="status-row">
+              <span>Mã phòng</span>
+              <strong id="roomCode">-</strong>
+            </div>
+            <div class="status-row">
+              <span>Màu của bạn</span>
+              <strong id="playerMark">-</strong>
+            </div>
+            <div class="status-row">
+              <span>Nước thứ</span>
+              <strong id="moveNumber">-</strong>
+            </div>
+            <div class="status-row">
+              <span>Người chơi</span>
+              <strong id="playersStatus">0/2</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Người chơi</h2>
+          <div id="whitePlayer" class="player-card">
+            <div class="player-piece">&#9812;</div>
+            <div>
+              <div class="player-name">Trắng</div>
+              <div id="whiteMeta" class="player-meta">Đang chờ</div>
+            </div>
+            <div id="whiteBadge" class="badge waiting">Chờ</div>
+          </div>
+          <div id="blackPlayer" class="player-card">
+            <div class="player-piece">&#9818;</div>
+            <div>
+              <div class="player-name">Đen</div>
+              <div id="blackMeta" class="player-meta">Đang chờ</div>
+            </div>
+            <div id="blackBadge" class="badge waiting">Chờ</div>
+          </div>
+          <div id="message" class="message">Kết nối server để bắt đầu.</div>
+        </section>
+      </aside>
+
+      <section class="play-column">
+        <div id="turnBanner" class="turn-banner">
+          <div id="turnTitle" class="turn-title">Đang kết nối</div>
+          <div id="turnDetail" class="turn-detail">Tạo phòng mới hoặc nhập mã phòng để vào ván.</div>
+        </div>
+
+        <section class="board-wrap">
+          <div id="board" class="board"></div>
+        </section>
+      </section>
+
+    </section>
+  </main>
+
+  <div id="promotionBackdrop" class="promotion-backdrop">
+    <div class="dialog">
+      <h2>Chọn quân phong cấp</h2>
+      <p>Tốt của bạn đã tới hàng cuối.</p>
+      <div id="promotionOptions" class="promotion-options"></div>
+    </div>
+  </div>
+
+  <div id="resultBackdrop" class="result-backdrop">
+    <div class="dialog">
+      <h2 id="resultTitle">Ván cờ kết thúc</h2>
+      <p id="resultText">Kết quả ván đấu.</p>
+      <div class="dialog-actions">
+        <button id="btnResultRestart">Chơi lại</button>
+        <button id="btnCloseResult" class="ghost">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BOARD_SIZE = 8;
+    const PIECES = {
+      K: "\u2654",
+      Q: "\u2655",
+      R: "\u2656",
+      B: "\u2657",
+      N: "\u2658",
+      P: "\u2659",
+      k: "\u265A",
+      q: "\u265B",
+      r: "\u265C",
+      b: "\u265D",
+      n: "\u265E",
+      p: "\u265F",
+    };
+    const COLOR_LABELS = {
+      white: "Trắng",
+      black: "Đen",
+      viewer: "Khán giả",
+    };
+    const RESULT_REASONS = {
+      checkmate: "Chiếu hết",
+      stalemate: "Hòa do hết nước đi hợp lệ",
+      insufficient_material: "Hòa do không đủ quân chiếu hết",
+      seventyfive_moves: "Hòa do 75 nước không ăn quân/đi tốt",
+      fivefold_repetition: "Hòa do lặp lại thế cờ 5 lần",
+      fifty_moves: "Hòa do 50 nước",
+      threefold_repetition: "Hòa do lặp lại thế cờ 3 lần",
+      variant_win: "Thắng theo biến thể",
+      variant_loss: "Thua theo biến thể",
+      variant_draw: "Hòa theo biến thể",
+    };
+
+    const boardElement = document.getElementById("board");
+    const connectionStatus = document.getElementById("connectionStatus");
+    const roomInput = document.getElementById("roomInput");
+    const btnCreate = document.getElementById("btnCreate");
+    const btnJoin = document.getElementById("btnJoin");
+    const btnRestart = document.getElementById("btnRestart");
+    const btnResultRestart = document.getElementById("btnResultRestart");
+    const btnCloseResult = document.getElementById("btnCloseResult");
+    const roomCode = document.getElementById("roomCode");
+    const playerMark = document.getElementById("playerMark");
+    const moveNumber = document.getElementById("moveNumber");
+    const playersStatus = document.getElementById("playersStatus");
+    const messageBox = document.getElementById("message");
+    const turnBanner = document.getElementById("turnBanner");
+    const turnTitle = document.getElementById("turnTitle");
+    const turnDetail = document.getElementById("turnDetail");
+    const whitePlayer = document.getElementById("whitePlayer");
+    const blackPlayer = document.getElementById("blackPlayer");
+    const whiteMeta = document.getElementById("whiteMeta");
+    const blackMeta = document.getElementById("blackMeta");
+    const whiteBadge = document.getElementById("whiteBadge");
+    const blackBadge = document.getElementById("blackBadge");
+    const promotionBackdrop = document.getElementById("promotionBackdrop");
+    const promotionOptions = document.getElementById("promotionOptions");
+    const resultBackdrop = document.getElementById("resultBackdrop");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultText = document.getElementById("resultText");
+
+    let socket = null;
+    let state = null;
+    let myMark = null;
+    let selectedSquare = null;
+    let currentView = "white";
+    let shownResultFen = null;
+
+    connect();
+    renderEmptyBoard();
+
+    btnCreate.addEventListener("click", () => send({ type: "create_room" }));
+    btnJoin.addEventListener("click", joinRoom);
+    btnRestart.addEventListener("click", restartGame);
+    btnResultRestart.addEventListener("click", restartGame);
+    btnCloseResult.addEventListener("click", () => resultBackdrop.classList.remove("open"));
+    roomInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        joinRoom();
+      }
+    });
+    promotionBackdrop.addEventListener("click", (event) => {
+      if (event.target === promotionBackdrop) {
+        closePromotionDialog();
+      }
+    });
+
+    function connect() {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+      socket.addEventListener("open", () => {
+        connectionStatus.textContent = "Đã kết nối";
+        messageBox.textContent = "Tạo phòng mới hoặc nhập mã phòng để chơi.";
+        updateTurnBanner("Sẵn sàng", "Tạo phòng mới hoặc nhập mã phòng để vào ván.", "");
+      });
+
+      socket.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        handleMessage(data);
+      });
+
+      socket.addEventListener("close", () => {
+        connectionStatus.textContent = "Mất kết nối";
+        messageBox.textContent = "Đã mất kết nối server. Tải lại trang để kết nối lại.";
+        updateTurnBanner("Mất kết nối", "Tải lại trang để kết nối lại server.", "warning");
+        setRoomControls(false);
+      });
+    }
+
+    function handleMessage(data) {
+      if (data.type === "room_created" || data.type === "joined") {
+        myMark = data.mark;
+        if (data.mark === "viewer") {
+          messageBox.textContent = "Phòng đã đủ người chơi. Bạn đang xem ván này.";
+        } else {
+          messageBox.textContent = data.type === "room_created"
+            ? "Đã tạo phòng. Gửi mã phòng cho người thứ hai."
+            : "Đã vào phòng. Ván cờ bắt đầu.";
+        }
+        setRoomControls(true);
+        ensureBoardView();
+        return;
+      }
+
+      if (data.type === "state") {
+        state = data;
+        myMark = data.mark || myMark;
+        selectedSquare = null;
+        closePromotionDialog();
+        ensureBoardView();
+        renderState();
+        return;
+      }
+
+      if (data.type === "error") {
+        messageBox.textContent = data.message;
+        return;
+      }
+
+      if (data.type === "opponent_left") {
+        messageBox.textContent = `Người chơi ${colorLabel(data.mark)} đã rời phòng.`;
+      }
+    }
+
+    function joinRoom() {
+      const room = roomInput.value.trim();
+      if (!/^\d{6}$/.test(room)) {
+        messageBox.textContent = "Nhập mã phòng gồm 6 chữ số.";
+        return;
+      }
+
+      send({ type: "join_room", room });
+    }
+
+    function restartGame() {
+      resultBackdrop.classList.remove("open");
+      shownResultFen = null;
+      send({ type: "restart" });
+    }
+
+    function send(payload) {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        messageBox.textContent = "Chưa kết nối được server.";
+        return;
+      }
+
+      socket.send(JSON.stringify(payload));
+    }
+
+    function ensureBoardView() {
+      const nextView = myMark === "black" ? "black" : "white";
+      if (nextView !== currentView || boardElement.children.length === 0) {
+        currentView = nextView;
+        renderEmptyBoard();
+      }
+    }
+
+    function renderEmptyBoard() {
+      boardElement.innerHTML = "";
+
+      for (let row = 0; row < BOARD_SIZE; row++) {
+        for (let col = 0; col < BOARD_SIZE; col++) {
+          const cell = document.createElement("button");
+          const square = squareFromRowCol(row, col);
+          cell.className = baseCellClass(row, col);
+          cell.type = "button";
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+          cell.dataset.square = square;
+          cell.addEventListener("click", () => handleCellClick(square));
+          boardElement.appendChild(cell);
+        }
+      }
+    }
+
+    function renderState() {
+      roomCode.innerHTML = state.room ? `<span class="room-code">${escapeHtml(state.room)}</span>` : "-";
+      playerMark.textContent = colorLabel(myMark);
+      moveNumber.textContent = state.fullmoveNumber || "-";
+
+      const playerCount = Number(Boolean(state.players?.white)) + Number(Boolean(state.players?.black));
+      const viewerCount = Number(state.viewerCount || 0);
+      playersStatus.textContent = viewerCount > 0
+        ? `${playerCount}/2 · ${viewerCount} khán giả`
+        : `${playerCount}/2`;
+
+      btnRestart.disabled = state.status !== "finished" || myMark === "viewer";
+      btnResultRestart.disabled = state.status !== "finished" || myMark === "viewer";
+      updatePlayers();
+      updateMessage();
+      renderBoard();
+      maybeShowResult();
+    }
+
+    function updatePlayers() {
+      setPlayerCard("white", whitePlayer, whiteMeta, whiteBadge);
+      setPlayerCard("black", blackPlayer, blackMeta, blackBadge);
+    }
+
+    function setPlayerCard(color, card, meta, badge) {
+      const connected = Boolean(state.players?.[color]);
+      const isTurn = state.status === "playing" && state.turn === color;
+
+      card.classList.toggle("active", isTurn);
+      meta.textContent = connected ? playerDescription(color) : "Đang chờ";
+      badge.textContent = isTurn ? "Đang đi" : connected ? "Sẵn sàng" : "Chờ";
+      badge.classList.toggle("waiting", !connected);
+    }
+
+    function updateMessage() {
+      if (!state) return;
+
+      if (state.status === "waiting") {
+        messageBox.textContent = "Đang chờ người thứ hai vào phòng.";
+        updateTurnBanner("Đang chờ đối thủ", "Gửi mã phòng cho người thứ hai để bắt đầu ván.", "warning");
+        return;
+      }
+
+      if (state.status === "finished") {
+        const summary = resultSummary();
+        messageBox.textContent = summary.detail;
+        updateTurnBanner(summary.title, summary.detail, "finished");
+        return;
+      }
+
+      if (state.isCheck) {
+        const title = state.turn === myMark ? "Bạn đang bị chiếu" : `${colorLabel(state.turn)} đang bị chiếu`;
+        updateTurnBanner(title, "Cần xử lý nước chiếu trước khi tấn công tiếp.", "warning");
+        messageBox.textContent = title + ".";
+        return;
+      }
+
+      if (state.turn === myMark) {
+        updateTurnBanner("Đến lượt bạn", `Bạn cầm ${colorLabel(myMark)}. Chọn quân và đi nước tiếp theo.`, "my-turn");
+        messageBox.textContent = "Đến lượt bạn.";
+      } else if (myMark === "viewer") {
+        updateTurnBanner("Đang xem ván cờ", `${colorLabel(state.turn)} đang đi.`, "");
+        messageBox.textContent = "Bạn là khán giả, có thể theo dõi ván cờ realtime.";
+      } else {
+        updateTurnBanner(`Đang chờ ${colorLabel(state.turn)}`, "Theo dõi nước vừa rồi được tô sáng trên bàn cờ.", "");
+        messageBox.textContent = `Đang chờ ${colorLabel(state.turn)}.`;
+      }
+    }
+
+    function updateTurnBanner(title, detail, className) {
+      turnTitle.textContent = title;
+      turnDetail.textContent = detail;
+      turnBanner.className = `turn-banner ${className}`.trim();
+    }
+
+    function renderBoard() {
+      const legalTargets = new Set(movesFromSelected().map((move) => move.to));
+      const lastSquares = lastMoveSquares();
+
+      for (const cell of boardElement.children) {
+        const row = Number(cell.dataset.row);
+        const col = Number(cell.dataset.col);
+        const square = cell.dataset.square;
+        const piece = pieceAt(square);
+
+        cell.textContent = piece ? PIECES[piece.symbol] : "";
+        cell.className = baseCellClass(row, col);
+        if (piece) {
+          cell.classList.add(`${piece.color}-piece`);
+        }
+        if (lastSquares.has(square)) {
+          cell.classList.add("last-move");
+        }
+        if (square === selectedSquare) {
+          cell.classList.add("selected");
+        }
+        if (legalTargets.has(square)) {
+          cell.classList.add(piece ? "capture" : "legal");
+        }
+        if (!canInteractWithBoard()) {
+          cell.classList.add("disabled");
+        }
+      }
+    }
+
+    function handleCellClick(square) {
+      if (!canInteractWithBoard()) {
+        return;
+      }
+
+      const piece = pieceAt(square);
+      if (!selectedSquare) {
+        selectOwnPiece(square, piece);
+        return;
+      }
+
+      if (square === selectedSquare) {
+        selectedSquare = null;
+        renderBoard();
+        return;
+      }
+
+      const matchingMoves = movesFromSelected().filter((move) => move.to === square);
+      if (matchingMoves.length > 0) {
+        playMove(matchingMoves);
+        return;
+      }
+
+      if (piece?.color === myMark) {
+        selectOwnPiece(square, piece);
+        return;
+      }
+
+      send({ type: "move", from: selectedSquare, to: square });
+      selectedSquare = null;
+      renderBoard();
+    }
+
+    function selectOwnPiece(square, piece) {
+      if (!piece || piece.color !== myMark) {
+        selectedSquare = null;
+        renderBoard();
+        return;
+      }
+
+      selectedSquare = square;
+      renderBoard();
+    }
+
+    function playMove(matchingMoves) {
+      if (matchingMoves.length > 1 || matchingMoves[0].promotion) {
+        openPromotionDialog(matchingMoves);
+        return;
+      }
+
+      send({ type: "move", from: matchingMoves[0].from, to: matchingMoves[0].to });
+    }
+
+    function openPromotionDialog(moves) {
+      promotionOptions.innerHTML = "";
+
+      for (const move of moves) {
+        if (!move.promotion) {
+          continue;
+        }
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = promotionSymbol(move.promotion);
+        button.addEventListener("click", () => {
+          send({ type: "move", from: move.from, to: move.to, promotion: move.promotion });
+        });
+        promotionOptions.appendChild(button);
+      }
+
+      promotionBackdrop.classList.add("open");
+    }
+
+    function closePromotionDialog() {
+      promotionBackdrop.classList.remove("open");
+      promotionOptions.innerHTML = "";
+    }
+
+    function maybeShowResult() {
+      if (state.status !== "finished" || shownResultFen === state.fen) {
+        return;
+      }
+
+      const summary = resultSummary();
+      resultTitle.textContent = summary.title;
+      resultText.textContent = summary.detail;
+      resultBackdrop.classList.add("open");
+      shownResultFen = state.fen;
+    }
+
+    function resultSummary() {
+      const reason = RESULT_REASONS[state.resultReason] || "Ván cờ kết thúc";
+      if (state.winner) {
+        const won = state.winner === myMark;
+        return {
+          title: won ? "Bạn thắng!" : `${colorLabel(state.winner)} thắng`,
+          detail: `${reason}. ${colorLabel(state.winner)} thắng ván này.`,
+        };
+      }
+
+      return {
+        title: "Ván cờ hòa",
+        detail: reason,
+      };
+    }
+
+    function movesFromSelected() {
+      if (!state || !selectedSquare) {
+        return [];
+      }
+
+      return (state.legalMoves || []).filter((move) => move.from === selectedSquare);
+    }
+
+    function canInteractWithBoard() {
+      return Boolean(
+        state &&
+        state.status === "playing" &&
+        myMark !== "viewer" &&
+        state.players?.white &&
+        state.players?.black &&
+        state.turn === myMark
+      );
+    }
+
+    function pieceAt(square) {
+      if (!state?.board) {
+        return null;
+      }
+
+      for (const row of state.board) {
+        for (const piece of row) {
+          if (piece?.square === square) {
+            return piece;
+          }
+        }
+      }
+
+      return null;
+    }
+
+    function lastMoveSquares() {
+      if (!state?.lastMove) {
+        return new Set();
+      }
+
+      return new Set([state.lastMove.from, state.lastMove.to]);
+    }
+
+    function squareFromRowCol(row, col) {
+      const isBlackView = currentView === "black";
+      const fileIndex = isBlackView ? 7 - col : col;
+      const rank = isBlackView ? row + 1 : 8 - row;
+      const file = String.fromCharCode("a".charCodeAt(0) + fileIndex);
+      return `${file}${rank}`;
+    }
+
+    function baseCellClass(row, col) {
+      return `cell ${(row + col) % 2 === 0 ? "light" : "dark"}`;
+    }
+
+    function promotionSymbol(promotion) {
+      const symbol = myMark === "white" ? promotion.toUpperCase() : promotion.toLowerCase();
+      return PIECES[symbol] || promotion.toUpperCase();
+    }
+
+    function playerDescription(color) {
+      if (myMark === "viewer") {
+        return "Người chơi";
+      }
+
+      if (color === myMark) {
+        return "Bạn";
+      }
+
+      return "Đối thủ";
+    }
+
+    function setRoomControls(inRoom) {
+      btnCreate.disabled = inRoom;
+      btnJoin.disabled = inRoom;
+      roomInput.disabled = inRoom;
+    }
+
+    function colorLabel(color) {
+      return COLOR_LABELS[color] || "-";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>OCR nhận diện số</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f4f4f4;
+    }
+
+    .box {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #ccc;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .preview-item {
+      position: relative;
+      font-size: 12px;
+      color: #333;
+      overflow-wrap: anywhere;
+      border: 1px solid #ddd;
+      padding: 8px;
+      border-radius: 8px;
+      background: #fafafa;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .preview-item:hover {
+      background: #f0f0f0;
+      transform: translateY(-1px);
+    }
+
+    .preview-name {
+      padding-right: 28px;
+      min-height: 32px;
+    }
+
+    .preview-item img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    .delete-img-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      margin: 0;
+      border: none;
+      border-radius: 50%;
+      background: #d93025;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 24px;
+      text-align: center;
+    }
+
+    .delete-img-btn:hover {
+      background: #a50e0e;
+    }
+
+    button {
+      margin-top: 15px;
+      margin-right: 8px;
+      padding: 10px 18px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: white;
+    }
+
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    .progress {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    pre {
+      background: #111;
+      color: #0f0;
+      padding: 15px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      max-height: 260px;
+      overflow: auto;
+    }
+
+    .table-wrap {
+      max-height: 360px;
+      overflow-y: auto;
+      overflow-x: auto;
+      margin-top: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    th {
+      background: #eee;
+    }
+
+    .table-wrap thead th {
+      position: sticky;
+      top: 0;
+      background: #eee;
+      z-index: 2;
+    }
+
+    .low {
+      color: red;
+      font-weight: bold;
+    }
+
+    .medium {
+      color: #c77a00;
+      font-weight: bold;
+    }
+
+    .high {
+      color: green;
+      font-weight: bold;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .modal-content {
+      position: relative;
+      max-width: 95vw;
+      max-height: 95vh;
+      background: white;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #000;
+    }
+
+    .modal-content img {
+      max-width: 90vw;
+      max-height: 80vh;
+      display: block;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+
+    .modal-file-name {
+      font-weight: bold;
+      padding-right: 42px;
+      overflow-wrap: anywhere;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      margin: 0;
+      border-radius: 50%;
+      background: #222;
+      color: white;
+      font-size: 22px;
+      line-height: 34px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>OCR nhận diện số từ ảnh</h2>
+
+  <input type="file" id="imageInput" accept="image/*" multiple>
+
+  <br>
+
+  <div id="previewList" class="preview-grid"></div>
+
+  <br>
+
+  <button id="btnRun" onclick="runOCR()">Nhận diện</button>
+  <button id="btnExport" onclick="exportExcel()" disabled>Xuất Excel</button>
+  <button id="btnClear" onclick="clearAll()">Xóa tất cả</button>
+
+  <div id="progress" class="progress"></div>
+
+  <h3>Kết quả:</h3>
+
+  <div id="tableWrap" class="table-wrap" style="display:none;">
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>File</th>
+          <th>Number</th>
+          <th>Confidence</th>
+        </tr>
+      </thead>
+      <tbody id="resultBody"></tbody>
+    </table>
+  </div>
+
+  <h3>Log:</h3>
+  <pre id="result">Chưa có kết quả</pre>
+</div>
+
+<div id="imageModal" class="modal" onclick="closeImageModal()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeImageModal()">×</button>
+    <div id="modalFileName" class="modal-file-name"></div>
+    <img id="modalImage" src="" alt="">
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script>
+  const API_URL = "http://101.103.113.70:8000/ocr";
+
+  const imageInput = document.getElementById("imageInput");
+  const previewList = document.getElementById("previewList");
+  const resultBox = document.getElementById("result");
+  const progressBox = document.getElementById("progress");
+  const tableWrap = document.getElementById("tableWrap");
+  const resultBody = document.getElementById("resultBody");
+
+  const btnRun = document.getElementById("btnRun");
+  const btnExport = document.getElementById("btnExport");
+  const btnClear = document.getElementById("btnClear");
+
+  const imageModal = document.getElementById("imageModal");
+  const modalImage = document.getElementById("modalImage");
+  const modalFileName = document.getElementById("modalFileName");
+
+  let selectedImages = [];
+  let ocrData = [];
+  let isRunning = false;
+
+  imageInput.addEventListener("change", function () {
+    revokeAllObjectUrls();
+
+    selectedImages = Array.from(this.files || []).map((file, index) => {
+      return {
+        id: createId(index),
+        file: file,
+        url: URL.createObjectURL(file)
+      };
+    });
+
+    ocrData = [];
+
+    renderPreview();
+    renderResult();
+
+    if (selectedImages.length > 0) {
+      resultBox.textContent = `Đã chọn ${selectedImages.length} ảnh. Bấm "Nhận diện" để chạy OCR.`;
+    } else {
+      resultBox.textContent = "Chưa có kết quả";
+    }
+
+    btnExport.disabled = true;
+  });
+
+  function createId(index) {
+    return `${Date.now()}_${index}_${Math.random().toString(16).slice(2)}`;
+  }
+
+  function renderPreview() {
+    previewList.innerHTML = "";
+
+    selectedImages.forEach((imageItem, index) => {
+      const item = document.createElement("div");
+      item.className = "preview-item";
+      item.onclick = () => openImageModal(imageItem.id);
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-img-btn";
+      deleteBtn.textContent = "×";
+      deleteBtn.title = "Xóa ảnh này";
+      deleteBtn.disabled = isRunning;
+      deleteBtn.onclick = (event) => {
+        event.stopPropagation();
+        deleteImage(imageItem.id);
+      };
+
+      const name = document.createElement("div");
+      name.className = "preview-name";
+      name.textContent = `${index + 1}. ${imageItem.file.name}`;
+
+      const img = document.createElement("img");
+      img.src = imageItem.url;
+      img.alt = imageItem.file.name;
+
+      item.appendChild(deleteBtn);
+      item.appendChild(name);
+      item.appendChild(img);
+      previewList.appendChild(item);
+    });
+  }
+
+  function openImageModal(id) {
+    const imageItem = selectedImages.find(x => x.id === id);
+    if (!imageItem) return;
+
+    modalImage.src = imageItem.url;
+    modalImage.alt = imageItem.file.name;
+    modalFileName.textContent = imageItem.file.name;
+    imageModal.style.display = "flex";
+  }
+
+  function closeImageModal() {
+    imageModal.style.display = "none";
+    modalImage.src = "";
+    modalFileName.textContent = "";
+  }
+
+  function deleteImage(id) {
+    if (isRunning) {
+      alert("Đang nhận diện, không xóa ảnh được.");
+      return;
+    }
+
+    const imageItem = selectedImages.find(x => x.id === id);
+
+    if (imageItem) {
+      URL.revokeObjectURL(imageItem.url);
+    }
+
+    selectedImages = selectedImages.filter(x => x.id !== id);
+
+    // Xóa luôn kết quả OCR của ảnh đó nếu đã nhận diện rồi
+    ocrData = ocrData.filter(x => x.fileId !== id);
+
+    // Reset input để có thể chọn lại cùng file
+    imageInput.value = "";
+
+    renderPreview();
+    renderResult();
+
+    btnExport.disabled = ocrData.length === 0;
+
+    if (selectedImages.length === 0) {
+      resultBox.textContent = "Chưa có kết quả";
+      progressBox.textContent = "";
+    } else {
+      resultBox.textContent = `Còn ${selectedImages.length} ảnh.`;
+    }
+  }
+
+  async function runOCR() {
+    if (selectedImages.length === 0) {
+      alert("Chọn ảnh trước đã");
+      return;
+    }
+
+    setLoading(true);
+
+    ocrData = [];
+    renderResult();
+
+    const errors = [];
+    const startTime = Date.now();
+
+    for (let i = 0; i < selectedImages.length; i++) {
+      const imageItem = selectedImages[i];
+      const file = imageItem.file;
+
+      progressBox.textContent = `Đang xử lý ${i + 1}/${selectedImages.length}: ${file.name}`;
+      resultBox.textContent = `Đang gửi ảnh lên server...\nFile: ${file.name}`;
+
+      try {
+        const data = await callOcrApi(file);
+        const numbers = data.data || [];
+
+        if (numbers.length === 0) {
+          errors.push(`${file.name}: Không tìm thấy số`);
+        }
+
+        numbers.forEach(item => {
+          ocrData.push({
+            fileId: imageItem.id,
+            fileName: file.name,
+            number: String(item.number),
+            confidence: Number(item.confidence || 0)
+          });
+        });
+
+        renderResult();
+
+      } catch (err) {
+        errors.push(`${file.name}: ${err.message}`);
+      }
+    }
+
+    const endTime = Date.now();
+    const seconds = ((endTime - startTime) / 1000).toFixed(1);
+
+    let log = "";
+    log += `Hoàn tất.\n`;
+    log += `Số ảnh: ${selectedImages.length}\n`;
+    log += `Số kết quả: ${ocrData.length}\n`;
+    log += `Thời gian: ${seconds}s\n`;
+
+    if (errors.length > 0) {
+      log += `\nẢnh lỗi / không có số:\n`;
+      log += errors.join("\n");
+    }
+
+    resultBox.textContent = log;
+    progressBox.textContent = "Xử lý xong.";
+
+    btnExport.disabled = ocrData.length === 0;
+
+    setLoading(false);
+  }
+
+  async function callOcrApi(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: formData
+    });
+
+    const json = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      const message = json?.detail || json?.error || `Server lỗi ${res.status}`;
+      throw new Error(message);
+    }
+
+    if (!json || json.success === false) {
+      throw new Error(json?.detail || json?.error || "API trả về lỗi");
+    }
+
+    return json;
+  }
+
+  function renderResult() {
+    resultBody.innerHTML = "";
+
+    if (ocrData.length === 0) {
+      tableWrap.style.display = "none";
+      return;
+    }
+
+    tableWrap.style.display = "block";
+
+    ocrData.forEach((item, index) => {
+      const tr = document.createElement("tr");
+      const confidenceClass = getConfidenceClass(item.confidence);
+
+      tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${escapeHtml(item.fileName)}</td>
+        <td>${escapeHtml(item.number)}</td>
+        <td class="${confidenceClass}">${item.confidence}</td>
+      `;
+
+      resultBody.appendChild(tr);
+    });
+  }
+
+  function getConfidenceClass(confidence) {
+    if (confidence >= 0.9) return "high";
+    if (confidence >= 0.7) return "medium";
+    return "low";
+  }
+
+  function exportExcel() {
+    if (!ocrData || ocrData.length === 0) {
+      alert("Chưa có dữ liệu để xuất Excel");
+      return;
+    }
+
+    const rows = ocrData.map((item, index) => ({
+      STT: index + 1,
+      File: item.fileName,
+      Number: item.number,
+      Confidence: item.confidence
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "OCR_Result");
+
+    const fileName = `ocr_result_${getDateTimeName()}.xlsx`;
+
+    XLSX.writeFile(workbook, fileName);
+  }
+
+  function clearAll() {
+    if (isRunning) {
+      alert("Đang nhận diện, không xóa được.");
+      return;
+    }
+
+    revokeAllObjectUrls();
+
+    selectedImages = [];
+    ocrData = [];
+
+    imageInput.value = "";
+    previewList.innerHTML = "";
+    resultBody.innerHTML = "";
+    tableWrap.style.display = "none";
+    progressBox.textContent = "";
+    resultBox.textContent = "Chưa có kết quả";
+    btnExport.disabled = true;
+
+    closeImageModal();
+  }
+
+  function revokeAllObjectUrls() {
+    selectedImages.forEach(item => {
+      if (item.url) {
+        URL.revokeObjectURL(item.url);
+      }
+    });
+  }
+
+  function setLoading(isLoading) {
+    isRunning = isLoading;
+
+    btnRun.disabled = isLoading;
+    btnClear.disabled = isLoading;
+    imageInput.disabled = isLoading;
+
+    if (isLoading) {
+      btnRun.textContent = "Đang chạy...";
+    } else {
+      btnRun.textContent = "Nhận diện";
+    }
+
+    renderPreview();
+  }
+
+  function getDateTimeName() {
+    const d = new Date();
+
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    const ss = String(d.getSeconds()).padStart(2, "0");
+
+    return `${yyyy}${mm}${dd}_${hh}${mi}${ss}`;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeImageModal();
+    }
+  });
+</script>
+
+</body>
+</html>

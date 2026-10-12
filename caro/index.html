@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caro Online</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: #202124;
+      background: #eef1f5;
+    }
+
+    .app {
+      width: min(1180px, calc(100vw - 24px));
+      margin: 0 auto;
+      padding: 24px 0;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: #5f6368;
+      font-size: 15px;
+    }
+
+    .connection {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #d5dae1;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: #ffffff;
+      border: 1px solid #d5dae1;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+    }
+
+    input {
+      width: 100%;
+      height: 40px;
+      border: 1px solid #c6ccd4;
+      border-radius: 6px;
+      padding: 0 10px;
+      font-size: 16px;
+    }
+
+    button {
+      height: 40px;
+      border: 0;
+      border-radius: 6px;
+      background: #1f6feb;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #343a40;
+    }
+
+    button:disabled {
+      background: #a8b0ba;
+      cursor: not-allowed;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 9px;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #eef1f5;
+      padding-bottom: 8px;
+    }
+
+    .status-row span:first-child {
+      color: #5f6368;
+    }
+
+    .message {
+      min-height: 42px;
+      margin-top: 14px;
+      padding: 10px;
+      border-radius: 6px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .board-wrap {
+      overflow: auto;
+      background: #ffffff;
+      border: 1px solid #d5dae1;
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(20, 32px);
+      grid-template-rows: repeat(20, 32px);
+      width: 640px;
+      height: 640px;
+      border: 2px solid #1f2937;
+      background: #f7d992;
+    }
+
+    .cell {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 1px solid rgba(31, 41, 55, 0.42);
+      border-radius: 0;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+      background: transparent;
+      color: #111827;
+      user-select: none;
+    }
+
+    .cell:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .cell.disabled {
+      cursor: default;
+    }
+
+    .cell.disabled:hover {
+      background: transparent;
+    }
+
+    .cell.o {
+      color: #dc2626;
+    }
+
+    .cell.win {
+      background: #fde047;
+    }
+
+    .room-code {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f766e;
+      letter-spacing: 0;
+    }
+
+    @media (max-width: 820px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .board {
+        grid-template-columns: repeat(20, 28px);
+        grid-template-rows: repeat(20, 28px);
+        width: 560px;
+        height: 560px;
+      }
+
+      .cell {
+        width: 28px;
+        height: 28px;
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>Caro Online</h1>
+        <p class="subtitle">Tao phong, gui ma phong cho nguoi thu hai, roi danh caro realtime.</p>
+      </div>
+      <div id="connectionStatus" class="connection">Dang ket noi...</div>
+    </header>
+
+    <section class="layout">
+      <aside class="panel">
+        <h2>Phong choi</h2>
+        <div class="controls">
+          <button id="btnCreate">Tao phong moi</button>
+          <input id="roomInput" type="text" inputmode="numeric" maxlength="6" placeholder="Nhap ma phong">
+          <button id="btnJoin" class="secondary">Vao phong</button>
+          <button id="btnRestart" disabled>Choi lai</button>
+        </div>
+
+        <div class="status-list">
+          <div class="status-row">
+            <span>Ma phong</span>
+            <strong id="roomCode">-</strong>
+          </div>
+          <div class="status-row">
+            <span>Quan cua ban</span>
+            <strong id="playerMark">-</strong>
+          </div>
+          <div class="status-row">
+            <span>Luot hien tai</span>
+            <strong id="currentTurn">-</strong>
+          </div>
+          <div class="status-row">
+            <span>Nguoi choi</span>
+            <strong id="playersStatus">0/2</strong>
+          </div>
+        </div>
+
+        <div id="message" class="message">Ket noi server de bat dau.</div>
+      </aside>
+
+      <section class="board-wrap">
+        <div id="board" class="board"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const BOARD_SIZE = 20;
+    const boardElement = document.getElementById("board");
+    const connectionStatus = document.getElementById("connectionStatus");
+    const roomInput = document.getElementById("roomInput");
+    const btnCreate = document.getElementById("btnCreate");
+    const btnJoin = document.getElementById("btnJoin");
+    const btnRestart = document.getElementById("btnRestart");
+    const roomCode = document.getElementById("roomCode");
+    const playerMark = document.getElementById("playerMark");
+    const currentTurn = document.getElementById("currentTurn");
+    const playersStatus = document.getElementById("playersStatus");
+    const messageBox = document.getElementById("message");
+
+    let socket = null;
+    let state = null;
+    let myMark = null;
+
+    connect();
+    renderEmptyBoard();
+
+    btnCreate.addEventListener("click", () => send({ type: "create_room" }));
+    btnJoin.addEventListener("click", joinRoom);
+    btnRestart.addEventListener("click", () => send({ type: "restart" }));
+    roomInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        joinRoom();
+      }
+    });
+
+    function connect() {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+      socket.addEventListener("open", () => {
+        connectionStatus.textContent = "Da ket noi";
+        messageBox.textContent = "Tao phong moi hoac nhap ma phong de choi.";
+      });
+
+      socket.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        handleMessage(data);
+      });
+
+      socket.addEventListener("close", () => {
+        connectionStatus.textContent = "Mat ket noi";
+        messageBox.textContent = "Da mat ket noi server. Tai lai trang de ket noi lai.";
+        setRoomControls(false);
+      });
+    }
+
+    function handleMessage(data) {
+      if (data.type === "room_created" || data.type === "joined") {
+        myMark = data.mark;
+        messageBox.textContent = data.type === "room_created"
+          ? "Da tao phong. Gui ma phong cho nguoi thu hai."
+          : "Da vao phong. Van co bat dau.";
+        setRoomControls(true);
+        return;
+      }
+
+      if (data.type === "state") {
+        state = data;
+        myMark = data.mark || myMark;
+        renderState();
+        return;
+      }
+
+      if (data.type === "error") {
+        messageBox.textContent = data.message;
+        return;
+      }
+
+      if (data.type === "opponent_left") {
+        messageBox.textContent = `Nguoi choi ${data.mark} da roi phong. Phong van duoc giu lai.`;
+      }
+    }
+
+    function joinRoom() {
+      const room = roomInput.value.trim();
+      if (!/^\d{6}$/.test(room)) {
+        messageBox.textContent = "Nhap ma phong gom 6 chu so.";
+        return;
+      }
+
+      send({ type: "join_room", room });
+    }
+
+    function send(payload) {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        messageBox.textContent = "Chua ket noi duoc server.";
+        return;
+      }
+
+      socket.send(JSON.stringify(payload));
+    }
+
+    function renderEmptyBoard() {
+      boardElement.innerHTML = "";
+
+      for (let row = 0; row < BOARD_SIZE; row++) {
+        for (let col = 0; col < BOARD_SIZE; col++) {
+          const cell = document.createElement("button");
+          cell.className = "cell disabled";
+          cell.type = "button";
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+          cell.addEventListener("click", () => playMove(row, col));
+          boardElement.appendChild(cell);
+        }
+      }
+    }
+
+    function renderState() {
+      roomCode.innerHTML = state.room ? `<span class="room-code">${escapeHtml(state.room)}</span>` : "-";
+      playerMark.textContent = myMark || "-";
+      currentTurn.textContent = state.turn || "-";
+
+      const playerCount = Number(Boolean(state.players?.X)) + Number(Boolean(state.players?.O));
+      playersStatus.textContent = `${playerCount}/2`;
+
+      btnRestart.disabled = state.status !== "finished";
+      updateMessage();
+      renderBoard();
+    }
+
+    function updateMessage() {
+      if (!state) return;
+
+      if (state.status === "waiting") {
+        messageBox.textContent = "Dang cho nguoi thu hai vao phong.";
+        return;
+      }
+
+      if (state.status === "finished") {
+        if (state.winner) {
+          messageBox.textContent = state.winner === myMark ? "Ban da thang!" : `Nguoi choi ${state.winner} da thang.`;
+        } else {
+          messageBox.textContent = "Van co hoa.";
+        }
+        return;
+      }
+
+      messageBox.textContent = state.turn === myMark ? "Den luot ban." : `Dang cho nguoi choi ${state.turn}.`;
+    }
+
+    function renderBoard() {
+      const winMap = new Set((state.winningCells || []).map(([row, col]) => `${row},${col}`));
+
+      for (const cell of boardElement.children) {
+        const row = Number(cell.dataset.row);
+        const col = Number(cell.dataset.col);
+        const value = state.board?.[row]?.[col] || "";
+
+        cell.textContent = value;
+        cell.className = "cell";
+        if (value === "O") {
+          cell.classList.add("o");
+        }
+        if (winMap.has(`${row},${col}`)) {
+          cell.classList.add("win");
+        }
+        if (!canPlayCell(row, col)) {
+          cell.classList.add("disabled");
+        }
+      }
+    }
+
+    function canPlayCell(row, col) {
+      return Boolean(
+        state &&
+        state.status === "playing" &&
+        state.players?.X &&
+        state.players?.O &&
+        state.turn === myMark &&
+        !state.board[row][col]
+      );
+    }
+
+    function playMove(row, col) {
+      if (!canPlayCell(row, col)) {
+        return;
+      }
+
+      send({ type: "move", row, col });
+    }
+
+    function setRoomControls(inRoom) {
+      btnCreate.disabled = inRoom;
+      btnJoin.disabled = inRoom;
+      roomInput.disabled = inRoom;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>

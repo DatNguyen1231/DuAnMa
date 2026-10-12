@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cờ Tướng Online - Realtime Xiangqi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Noto+Serif+SC:wght@600;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #c92a2a;
+      --primary-hover: #b02525;
+      --primary-dark: #821717;
+      --board-wood-1: #ecd0a4;
+      --board-wood-2: #dfbc86;
+      --board-border: #421e06;
+      --board-border-gold: #c59b27;
+      --board-line: #3b1704;
+      --bg-card: rgba(255, 255, 255, 0.96);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --shadow-elevated: 0 20px 48px rgba(35, 18, 7, 0.38);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(201, 42, 42, 0.12), transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(197, 155, 39, 0.12), transparent 45%),
+        linear-gradient(145deg, #e7edf3 0%, #f8f6f2 50%, #edf1f7 100%);
+      background-attachment: fixed;
+      padding-bottom: 30px;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1340px, calc(100vw - 24px));
+      margin: 0 auto;
+      padding: 16px 0;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #fff7eb 0%, #ecd0a6 60%, #c59858 100%);
+      border: 2px solid var(--board-border);
+      box-shadow: 0 4px 12px rgba(90, 46, 18, 0.35);
+      display: grid;
+      place-items: center;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--primary);
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #1a202c;
+    }
+
+    h1 span.gold {
+      color: #b45309;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: #fef3c7;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid #fde68a;
+    }
+
+    .subtitle {
+      margin-top: 3px;
+      color: var(--text-muted);
+      font-size: 13.5px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-tool {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      transition: all 0.15s ease;
+    }
+
+    .btn-tool:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+    }
+
+    .connection-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #eab308;
+      box-shadow: 0 0 8px #eab308;
+      transition: all 0.3s;
+    }
+
+    .status-dot.connected {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    .status-dot.error {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+    }
+
+    /* Main layout */
+    .layout {
+      display: grid;
+      grid-template-columns: 310px 1fr 280px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(10px);
+    }
+
+    .panel + .panel {
+      margin-top: 16px;
+    }
+
+    .panel h2 {
+      font-size: 15.5px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+    }
+
+    input {
+      width: 100%;
+      height: 42px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 0 12px;
+      font-size: 15px;
+      font-weight: 600;
+      background: #ffffff;
+      color: #0f172a;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(201, 42, 42, 0.15);
+    }
+
+    button.btn-primary {
+      min-height: 42px;
+      border: 0;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #c92a2a 0%, #9e1919 100%);
+      color: white;
+      font-size: 14.5px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(201, 42, 42, 0.32);
+      transition: all 0.15s ease;
+    }
+
+    button.btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #b02525 0%, #821717 100%);
+      transform: translateY(-1px);
+    }
+
+    button.btn-secondary {
+      min-height: 40px;
+      border: 0;
+      border-radius: 8px;
+      background: #1e293b;
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+      transition: all 0.15s ease;
+    }
+
+    button.btn-secondary:hover:not(:disabled) {
+      background: #0f172a;
+      transform: translateY(-1px);
+    }
+
+    button.btn-solo {
+      min-height: 40px;
+      border: 0;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+      transition: all 0.15s ease;
+    }
+
+    button.btn-solo:hover:not(:disabled) {
+      background: #0f766e;
+      transform: translateY(-1px);
+    }
+
+    button.btn-restart {
+      min-height: 40px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #334155;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    button.btn-restart:hover:not(:disabled) {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 9px;
+      margin-top: 14px;
+      font-size: 13.5px;
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 7px;
+    }
+
+    .status-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .status-row span:first-child {
+      color: var(--text-muted);
+    }
+
+    .room-code-tag {
+      font-family: 'Cinzel', monospace;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .player-card {
+      display: grid;
+      grid-template-columns: 46px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 64px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #ffffff;
+      transition: all 0.2s ease;
+    }
+
+    .player-card + .player-card {
+      margin-top: 10px;
+    }
+
+    .player-card.active {
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(201, 42, 42, 0.16);
+      background: #fffafa;
+    }
+
+    .player-card.active.black-side {
+      border-color: #1e293b;
+      box-shadow: 0 4px 16px rgba(30, 41, 59, 0.18);
+      background: #f8fafc;
+    }
+
+    .player-piece-avatar {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #fff8eb 0%, #f6e6cc 55%, #dfb277 100%);
+      border: 2px solid var(--board-border);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 24px;
+      font-weight: 900;
+      user-select: none;
+    }
+
+    .player-piece-avatar.red {
+      color: var(--primary);
+      border-color: #821717;
+    }
+
+    .player-piece-avatar.black {
+      color: #1a202c;
+      border-color: #334155;
+    }
+
+    .player-name {
+      font-weight: 800;
+      font-size: 14.5px;
+    }
+
+    .player-meta {
+      margin-top: 2px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .badge {
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge.turn-red {
+      background: #fee2e2;
+      color: var(--primary);
+      border: 1px solid #fca5a5;
+    }
+
+    .badge.turn-black {
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+    }
+
+    .badge.waiting {
+      background: #f1f5f9;
+      color: #94a3b8;
+    }
+
+    .message {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    /* Turn Banner */
+    .turn-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      padding: 12px 18px;
+      background: #1e293b;
+      color: #ffffff;
+      box-shadow: 0 8px 24px rgba(30, 41, 59, 0.2);
+      transition: all 0.3s ease;
+      width: 100%;
+      max-width: 610px;
+    }
+
+    .turn-banner.my-turn {
+      background: linear-gradient(135deg, #c92a2a 0%, #821717 100%);
+      box-shadow: 0 8px 24px rgba(201, 42, 42, 0.35);
+    }
+
+    .turn-banner.warning {
+      background: linear-gradient(135deg, #d97706 0%, #92400e 100%);
+      box-shadow: 0 8px 24px rgba(217, 119, 6, 0.35);
+    }
+
+    .turn-banner.finished {
+      background: linear-gradient(135deg, #334155 0%, #0f172a 100%);
+    }
+
+    .turn-title {
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+    }
+
+    .turn-detail {
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    /* Chessboard Area */
+    .board-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .board-wrapper-card {
+      position: relative;
+      background: #421e06;
+      border: 4px solid var(--board-border-gold);
+      border-radius: 16px;
+      box-shadow:
+        0 24px 60px rgba(35, 18, 7, 0.42),
+        0 4px 12px rgba(0, 0, 0, 0.2);
+      padding: 10px;
+      user-select: none;
+      width: min(610px, 96vw);
+      max-width: 610px;
+    }
+
+    .board-inner-frame {
+      position: relative;
+      background: radial-gradient(circle at 50% 50%, #f3d4a6 0%, #e2b97c 65%, #c89552 100%);
+      border: 3px solid #2a1102;
+      border-radius: 8px;
+      padding: 32px 34px;
+      box-shadow: inset 0 0 24px rgba(80, 40, 10, 0.25);
+    }
+
+    .board-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 8 / 9;
+    }
+
+    .board-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* Coordinate labels around board frame */
+    .coord-labels-top,
+    .coord-labels-bottom {
+      position: absolute;
+      left: 34px;
+      right: 34px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: #6d3511;
+    }
+
+    .coord-labels-top {
+      top: 10px;
+    }
+
+    .coord-labels-bottom {
+      bottom: 10px;
+    }
+
+    .coord-labels-left,
+    .coord-labels-right {
+      position: absolute;
+      top: 32px;
+      bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      pointer-events: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #6d3511;
+    }
+
+    .coord-labels-left {
+      left: 12px;
+    }
+
+    .coord-labels-right {
+      right: 12px;
+    }
+
+    .board-intersections {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Board piece tokens */
+    .intersection-point {
+      position: absolute;
+      width: 12%;
+      height: 10.6%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      outline: none;
+      z-index: 2;
+    }
+
+    .intersection-point.disabled {
+      cursor: default;
+    }
+
+    .piece-token {
+      width: 90%;
+      height: 90%;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      position: relative;
+      background: radial-gradient(circle at 35% 30%, #fffcf5 0%, #f7ecd6 50%, #dfb77e 85%, #b68748 100%);
+      box-shadow:
+        0 4px 10px rgba(45, 23, 8, 0.45),
+        inset 0 2px 3px rgba(255, 255, 255, 0.9),
+        inset 0 -3px 5px rgba(100, 50, 10, 0.4);
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(20px, 4vw, 33px);
+      font-weight: 900;
+      line-height: 1;
+      transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.15s ease;
+      user-select: none;
+    }
+
+    .piece-token::before {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      border: 1.5px solid;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .piece-token.red {
+      color: #b91c1c;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9), 0 -1px 1px rgba(120, 10, 10, 0.3);
+    }
+
+    .piece-token.red::before {
+      border-color: #b91c1c;
+    }
+
+    .piece-token.black {
+      color: #0f172a;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8), 0 -1px 1px rgba(0, 0, 0, 0.4);
+    }
+
+    .piece-token.black::before {
+      border-color: #334155;
+    }
+
+    /* Latin Vietnamese name font style */
+    .piece-token.latin {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(10px, 1.8vw, 14px);
+      font-weight: 800;
+      letter-spacing: -0.2px;
+    }
+
+    .intersection-point:hover .piece-token {
+      transform: scale(1.08);
+      box-shadow:
+        0 6px 14px rgba(45, 23, 8, 0.55),
+        inset 0 2px 3px rgba(255, 255, 255, 0.9);
+    }
+
+    /* Selected state */
+    .intersection-point.selected .piece-token {
+      transform: scale(1.14);
+      box-shadow:
+        0 0 0 3px #f59e0b,
+        0 8px 20px rgba(245, 158, 11, 0.6);
+      z-index: 5;
+    }
+
+    /* Last move highlight */
+    .intersection-point.last-move::after {
+      content: "";
+      position: absolute;
+      width: 104%;
+      height: 104%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(234, 179, 8, 0.45) 0%, rgba(234, 179, 8, 0.1) 70%, transparent 100%);
+      pointer-events: none;
+      animation: pulse-aura 2s infinite ease-in-out;
+    }
+
+    /* Legal destination */
+    .intersection-point.legal::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.85);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+      z-index: 3;
+    }
+
+    /* Legal capture */
+    .intersection-point.capture::before {
+      content: "";
+      position: absolute;
+      width: 95%;
+      height: 95%;
+      border-radius: 50%;
+      border: 3.5px dashed #ef4444;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+      animation: spin-reticle 8s linear infinite;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    /* King in check */
+    .intersection-point.in-check .piece-token {
+      animation: check-shake 0.5s ease-in-out infinite alternate;
+      box-shadow:
+        0 0 0 4px #dc2626,
+        0 0 24px rgba(220, 38, 38, 0.8);
+    }
+
+    @keyframes pulse-aura {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.12); opacity: 0.4; }
+    }
+
+    @keyframes spin-reticle {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes check-shake {
+      0% { transform: translate(0, 0) scale(1.05); }
+      50% { transform: translate(-2px, 1px) scale(1.08); }
+      100% { transform: translate(2px, -1px) scale(1.05); }
+    }
+
+    /* Right column: Move History & Captured pieces */
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .captured-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .captured-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 13px;
+    }
+
+    .captured-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .captured-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .captured-chip.red { color: var(--primary); }
+    .captured-chip.black { color: #0f172a; }
+
+    .history-wrap {
+      max-height: 410px;
+      overflow-y: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .history-table th {
+      position: sticky;
+      top: 0;
+      background: #f1f5f9;
+      padding: 7px 10px;
+      font-weight: 700;
+      color: #475569;
+      border-bottom: 1.5px solid #cbd5e1;
+    }
+
+    .history-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .history-table tr:hover {
+      background: #f8fafc;
+    }
+
+    .history-table tr.latest {
+      background: #fef2f2;
+      font-weight: 700;
+    }
+
+    /* Result Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(420px, calc(100vw - 32px));
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+      text-align: center;
+      animation: modal-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modal-enter {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-icon {
+      font-size: 54px;
+      margin-bottom: 10px;
+    }
+
+    .modal-card h2 {
+      font-size: 24px;
+      font-weight: 900;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .modal-card p {
+      color: #64748b;
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.25s ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 1160px) {
+      .layout {
+        grid-template-columns: 290px 1fr;
+      }
+      .right-column {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .right-column {
+        grid-template-columns: 1fr;
+      }
+      .board-inner-frame {
+        padding: 24px 22px;
+      }
+      .coord-labels-top, .coord-labels-bottom {
+        left: 22px; right: 22px; font-size: 10.5px;
+      }
+      .coord-labels-left, .coord-labels-right {
+        top: 24px; bottom: 24px; font-size: 10px;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .top-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="logo-area">
+        <div class="logo-badge">帥</div>
+        <div>
+          <h1>Cờ Tướng Online <span class="gold">Realtime</span></h1>
+          <p class="subtitle">Bàn cờ chuẩn 9x10 có ô cờ rõ nét, tích hợp luật cờ tướng chính thức.</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button id="btnToggleSound" class="btn-tool" title="Bật/Tắt âm thanh">
+          <span id="soundIcon">🔊</span> Âm thanh
+        </button>
+        <button id="btnToggleFont" class="btn-tool" title="Đổi giao diện quân cờ">
+          🀄 <span id="fontModeLabel">Tiếng Việt</span>
+        </button>
+        <button id="btnFlipBoard" class="btn-tool" title="Xoay đổi chiều bàn cờ">
+          🔄 Đảo bàn cờ
+        </button>
+        <div class="connection-badge">
+          <span id="statusDot" class="status-dot"></span>
+          <span id="connectionStatus">Đang kết nối...</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Left sidebar: Room & matchmaking -->
+      <aside class="left-column">
+        <section class="panel">
+          <h2>Phòng đấu</h2>
+          <div class="controls">
+            <button id="btnCreate" class="btn-primary">Tạo phòng Online (2 người)</button>
+            <button id="btnSolo" class="btn-solo">Luyện tập (1 máy / 2 bên)</button>
+            <input id="roomInput" type="text" inputmode="numeric" maxlength="6" placeholder="Nhập mã phòng 6 số">
+            <button id="btnJoin" class="btn-secondary">Vào phòng</button>
+            <button id="btnRestart" class="btn-restart" disabled>Chơi lại ván mới</button>
+          </div>
+
+          <div class="status-list">
+            <div class="status-row">
+              <span>Mã phòng</span>
+              <strong id="roomCode" class="room-code-tag" title="Nhấp để sao chép mã">-</strong>
+            </div>
+            <div class="status-row">
+              <span>Phe của bạn</span>
+              <strong id="playerMark">-</strong>
+            </div>
+            <div class="status-row">
+              <span>Lượt đi</span>
+              <strong id="turnMark">-</strong>
+            </div>
+            <div class="status-row">
+              <span>Nước thứ</span>
+              <strong id="moveNumber">-</strong>
+            </div>
+            <div class="status-row">
+              <span>Người trong phòng</span>
+              <strong id="playersStatus">0/2</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Đấu thủ</h2>
+          <!-- Red Player -->
+          <div id="redPlayerCard" class="player-card">
+            <div class="player-piece-avatar red">帥</div>
+            <div>
+              <div class="player-name">Bên Đỏ (Đi trước)</div>
+              <div id="redMeta" class="player-meta">Đang chờ người chơi...</div>
+            </div>
+            <div id="redBadge" class="badge waiting">Chờ</div>
+          </div>
+
+          <!-- Black Player -->
+          <div id="blackPlayerCard" class="player-card black-side">
+            <div class="player-piece-avatar black">將</div>
+            <div>
+              <div class="player-name">Bên Đen (Đi sau)</div>
+              <div id="blackMeta" class="player-meta">Đang chờ người chơi...</div>
+            </div>
+            <div id="blackBadge" class="badge waiting">Chờ</div>
+          </div>
+
+          <div id="messageBox" class="message">
+            Kết nối máy chủ để bắt đầu trận đấu.
+          </div>
+        </section>
+      </aside>
+
+      <!-- Center: Chessboard Area -->
+      <section class="board-section">
+        <div id="turnBanner" class="turn-banner">
+          <div>
+            <div id="turnTitle" class="turn-title">Sẵn sàng</div>
+            <div id="turnDetail" class="turn-detail">Tạo phòng hoặc bấm Luyện tập để bắt đầu.</div>
+          </div>
+          <div id="checkAlert" style="font-size: 28px; display: none;">⚔️</div>
+        </div>
+
+        <div class="board-wrapper-card">
+          <div class="board-inner-frame">
+            <!-- Top Coordinate Labels (a - i) -->
+            <div class="coord-labels-top" id="coordTop">
+              <span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span><span>i</span>
+            </div>
+            <!-- Bottom Coordinate Labels (a - i) -->
+            <div class="coord-labels-bottom" id="coordBottom">
+              <span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span><span>i</span>
+            </div>
+            <!-- Left Coordinate Labels (10 down to 1) -->
+            <div class="coord-labels-left" id="coordLeft">
+              <span>10</span><span>9</span><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span>
+            </div>
+            <!-- Right Coordinate Labels (10 down to 1) -->
+            <div class="coord-labels-right" id="coordRight">
+              <span>10</span><span>9</span><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span>
+            </div>
+
+            <div id="boardContainer" class="board-container">
+              <!-- Crisp Authentic Xiangqi SVG Board with Visible Cells ("ô cờ") and Sharp Solid Lines -->
+              <svg class="board-svg" viewBox="0 0 800 900" xmlns="http://www.w3.org/2000/svg">
+                <!-- 1. The 64 square tiles ("ô cờ") -->
+                <!-- Top 4 rows of squares (Black territory: rows 0, 1, 2, 3) -->
+                <!-- Row 0: y=0..100 (ranks 10 to 9) -->
+                <rect x="0" y="0" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="100" y="0" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="200" y="0" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="300" y="0" width="100" height="100" fill="#dcb37e" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="400" y="0" width="100" height="100" fill="#dcb37e" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="500" y="0" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="600" y="0" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="700" y="0" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+
+                <!-- Row 1: y=100..200 (ranks 9 to 8) -->
+                <rect x="0" y="100" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="100" y="100" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="200" y="100" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="300" y="100" width="100" height="100" fill="#dcb37e" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="400" y="100" width="100" height="100" fill="#dcb37e" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="500" y="100" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="600" y="100" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="700" y="100" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+
+                <!-- Row 2: y=200..300 (ranks 8 to 7) -->
+                <rect x="0" y="200" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="100" y="200" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="200" y="200" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="300" y="200" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="400" y="200" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="500" y="200" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="600" y="200" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="700" y="200" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+
+                <!-- Row 3: y=300..400 (ranks 7 to 6) -->
+                <rect x="0" y="300" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="100" y="300" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="200" y="300" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="300" y="300" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="400" y="300" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="500" y="300" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="600" y="300" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="700" y="300" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+
+                <!-- THE RIVER (SỞ HÀ - HÁN GIỚI: y=400..500) -->
+                <rect x="0" y="400" width="800" height="100" fill="#dfb375" stroke="#3b1704" stroke-width="2.5" />
+                <g font-family="'Noto Serif SC', serif" font-weight="900" font-size="34" fill="#5c2606" letter-spacing="14">
+                  <text x="210" y="458" text-anchor="middle">楚河</text>
+                  <text x="590" y="458" text-anchor="middle">漢界</text>
+                </g>
+                <g font-family="'Outfit', sans-serif" font-weight="800" font-size="12" fill="#753509" letter-spacing="4">
+                  <text x="210" y="482" text-anchor="middle">SỞ HÀ</text>
+                  <text x="590" y="482" text-anchor="middle">HÁN GIỚI</text>
+                </g>
+
+                <!-- Bottom 4 rows of squares (Red territory: rows 5, 6, 7, 8) -->
+                <!-- Row 5: y=500..600 (ranks 5 to 4) -->
+                <rect x="0" y="500" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="100" y="500" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="200" y="500" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="300" y="500" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="400" y="500" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="500" y="500" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="600" y="500" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="700" y="500" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+
+                <!-- Row 6: y=600..700 (ranks 4 to 3) -->
+                <rect x="0" y="600" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="100" y="600" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="200" y="600" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="300" y="600" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="400" y="600" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="500" y="600" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="600" y="600" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="700" y="600" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+
+                <!-- Row 7: y=700..800 (ranks 3 to 2) -->
+                <rect x="0" y="700" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="100" y="700" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="200" y="700" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="300" y="700" width="100" height="100" fill="#dcb37e" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="400" y="700" width="100" height="100" fill="#dcb37e" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="500" y="700" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="600" y="700" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="700" y="700" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+
+                <!-- Row 8: y=800..900 (ranks 2 to 1) -->
+                <rect x="0" y="800" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="100" y="800" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="200" y="800" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="300" y="800" width="100" height="100" fill="#dcb37e" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="400" y="800" width="100" height="100" fill="#dcb37e" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="500" y="800" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="600" y="800" width="100" height="100" fill="#edd0a8" stroke="#3b1704" stroke-width="1.5" />
+                <rect x="700" y="800" width="100" height="100" fill="#e5c598" stroke="#3b1704" stroke-width="1.5" />
+
+                <!-- 2. Palace Crossing Diagonals -->
+                <!-- Top Palace Diagonals (x: 300..500, y: 0..200) -->
+                <line x1="300" y1="0" x2="500" y2="200" stroke="#3b1704" stroke-width="2.5" />
+                <line x1="500" y1="0" x2="300" y2="200" stroke="#3b1704" stroke-width="2.5" />
+
+                <!-- Bottom Palace Diagonals (x: 300..500, y: 700..900) -->
+                <line x1="300" y1="700" x2="500" y2="900" stroke="#3b1704" stroke-width="2.5" />
+                <line x1="500" y1="700" x2="300" y2="900" stroke="#3b1704" stroke-width="2.5" />
+
+                <!-- 3. Heavy Board Outer Border -->
+                <rect x="0" y="0" width="800" height="900" fill="none" stroke="#2a1102" stroke-width="5" />
+
+                <!-- 4. Star Markings (Hoa thị) on Cannons & Pawns -->
+                <g stroke="#3b1704" stroke-width="2.5" fill="none">
+                  <!-- Cannons at (100, 200), (700, 200), (100, 700), (700, 700) -->
+                  <path d="M 92,188 L 92,194 L 86,194 M 108,188 L 108,194 L 114,194 M 92,212 L 92,206 L 86,206 M 108,212 L 108,206 L 114,206" />
+                  <path d="M 692,188 L 692,194 L 686,194 M 708,188 L 708,194 L 714,194 M 692,212 L 692,206 L 686,206 M 708,212 L 708,206 L 714,206" />
+                  <path d="M 92,688 L 92,694 L 86,694 M 108,688 L 108,694 L 114,694 M 92,712 L 92,706 L 86,706 M 108,712 L 108,706 L 114,706" />
+                  <path d="M 692,688 L 692,694 L 686,694 M 708,688 L 708,694 L 714,694 M 692,712 L 692,706 L 686,706 M 708,712 L 708,706 L 714,706" />
+
+                  <!-- Pawns at y=300 (Rank 7) -->
+                  <path d="M 6,288 L 6,294 L 12,294 M 6,312 L 6,306 L 12,306" />
+                  <path d="M 192,288 L 192,294 L 186,294 M 208,288 L 208,294 L 214,294 M 192,312 L 192,306 L 186,306 M 208,312 L 208,306 L 214,306" />
+                  <path d="M 392,288 L 392,294 L 386,294 M 408,288 L 408,294 L 414,294 M 392,312 L 392,306 L 386,306 M 408,312 L 408,306 L 414,306" />
+                  <path d="M 592,288 L 592,294 L 586,294 M 608,288 L 608,294 L 614,294 M 592,312 L 592,306 L 586,306 M 608,312 L 608,306 L 614,306" />
+                  <path d="M 794,288 L 794,294 L 788,294 M 794,312 L 794,306 L 788,306" />
+
+                  <!-- Pawns at y=600 (Rank 4) -->
+                  <path d="M 6,588 L 6,594 L 12,594 M 6,612 L 6,606 L 12,606" />
+                  <path d="M 192,588 L 192,594 L 186,594 M 208,588 L 208,594 L 214,594 M 192,612 L 192,606 L 186,606 M 208,612 L 208,606 L 214,606" />
+                  <path d="M 392,588 L 392,594 L 386,594 M 408,588 L 408,594 L 414,594 M 392,612 L 392,606 L 386,606 M 408,612 L 408,606 L 414,606" />
+                  <path d="M 592,588 L 592,594 L 586,594 M 608,588 L 608,594 L 614,594 M 592,612 L 592,606 L 586,606 M 608,612 L 608,606 L 614,606" />
+                  <path d="M 794,588 L 794,594 L 788,594 M 794,612 L 794,606 L 788,606" />
+                </g>
+              </svg>
+
+              <!-- 90 interactive intersection points -->
+              <div id="boardIntersections" class="board-intersections"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right column: Captured & History -->
+      <aside class="right-column">
+        <section class="panel">
+          <h2>Quân cờ đã ăn</h2>
+          <div class="captured-box">
+            <div class="captured-row">
+              <strong style="color: var(--primary);">Đỏ ăn:</strong>
+              <div id="redCapturedList" class="captured-list">
+                <span style="color: #94a3b8; font-size: 12px;">Chưa có</span>
+              </div>
+            </div>
+            <div class="captured-row">
+              <strong style="color: #0f172a;">Đen ăn:</strong>
+              <div id="blackCapturedList" class="captured-list">
+                <span style="color: #94a3b8; font-size: 12px;">Chưa có</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Biên bản ván cờ</h2>
+          <div class="history-wrap">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th style="width: 44px;">#</th>
+                  <th>Đỏ</th>
+                  <th>Đen</th>
+                </tr>
+              </thead>
+              <tbody id="moveHistoryBody">
+                <tr>
+                  <td colspan="3" style="text-align: center; color: #94a3b8; padding: 14px;">Chưa có nước đi</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Result Dialog -->
+  <div id="resultModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div id="modalIcon" class="modal-icon">🏆</div>
+      <h2 id="modalTitle">Ván cờ kết thúc</h2>
+      <p id="modalDetail">Chi tiết kết quả ván đấu.</p>
+      <div class="modal-actions">
+        <button id="btnModalRestart" class="btn-primary">Chơi ván mới</button>
+        <button id="btnModalClose" class="btn-restart">Xem bàn cờ</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Đã sao chép mã phòng!</div>
+
+  <script>
+    const BOARD_COLS = 9;
+    const BOARD_ROWS = 10;
+    const FILES = "abcdefghi";
+
+    const PIECE_NAMES_VI = {
+      K: "TƯỚNG", A: "SĨ", B: "TƯỢNG", N: "MÃ", R: "XE", C: "PHÁO", P: "BINH",
+      k: "TƯỚNG", a: "SĨ", b: "TƯỢNG", n: "MÃ", r: "XE", c: "PHÁO", p: "TỐT",
+    };
+
+    const PIECE_CHARS_HAN = {
+      K: "帥", A: "仕", B: "相", N: "傌", R: "俥", C: "炮", P: "兵",
+      k: "將", a: "士", b: "象", n: "馬", r: "車", c: "砲", p: "卒",
+    };
+
+    const COLOR_LABELS = {
+      red: "Đỏ",
+      black: "Đen",
+      both: "2 bên (Luyện tập)",
+      viewer: "Khán giả",
+    };
+
+    const RESULT_TEXTS = {
+      checkmate: "Chiếu bí (Checkmate)",
+      stalemate: "Bức tử (Hết nước đi)",
+      repetition: "Hòa do lặp lại thế cờ 3 lần",
+      insufficient_material: "Hòa do không đủ lực lượng chiếu hết",
+      finished: "Ván cờ kết thúc",
+    };
+
+    // DOM Elements
+    const boardIntersections = document.getElementById("boardIntersections");
+    const connectionStatus = document.getElementById("connectionStatus");
+    const statusDot = document.getElementById("statusDot");
+    const roomInput = document.getElementById("roomInput");
+    const btnCreate = document.getElementById("btnCreate");
+    const btnSolo = document.getElementById("btnSolo");
+    const btnJoin = document.getElementById("btnJoin");
+    const btnRestart = document.getElementById("btnRestart");
+    const roomCode = document.getElementById("roomCode");
+    const playerMark = document.getElementById("playerMark");
+    const turnMark = document.getElementById("turnMark");
+    const moveNumber = document.getElementById("moveNumber");
+    const playersStatus = document.getElementById("playersStatus");
+    const messageBox = document.getElementById("messageBox");
+    const turnBanner = document.getElementById("turnBanner");
+    const turnTitle = document.getElementById("turnTitle");
+    const turnDetail = document.getElementById("turnDetail");
+    const checkAlert = document.getElementById("checkAlert");
+    const redPlayerCard = document.getElementById("redPlayerCard");
+    const blackPlayerCard = document.getElementById("blackPlayerCard");
+    const redMeta = document.getElementById("redMeta");
+    const blackMeta = document.getElementById("blackMeta");
+    const redBadge = document.getElementById("redBadge");
+    const blackBadge = document.getElementById("blackBadge");
+    const moveHistoryBody = document.getElementById("moveHistoryBody");
+    const redCapturedList = document.getElementById("redCapturedList");
+    const blackCapturedList = document.getElementById("blackCapturedList");
+    const resultModal = document.getElementById("resultModal");
+    const modalIcon = document.getElementById("modalIcon");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalDetail = document.getElementById("modalDetail");
+    const btnModalRestart = document.getElementById("btnModalRestart");
+    const btnModalClose = document.getElementById("btnModalClose");
+    const btnToggleSound = document.getElementById("btnToggleSound");
+    const soundIcon = document.getElementById("soundIcon");
+    const btnToggleFont = document.getElementById("btnToggleFont");
+    const fontModeLabel = document.getElementById("fontModeLabel");
+    const btnFlipBoard = document.getElementById("btnFlipBoard");
+    const coordLeft = document.getElementById("coordLeft");
+    const coordRight = document.getElementById("coordRight");
+    const toast = document.getElementById("toast");
+
+    // Game state
+    let socket = null;
+    let state = null;
+    let myMark = null; // "red" | "black" | "both" | "viewer" | null
+    let selectedSquare = null;
+    let currentView = "red"; // "red" (Red at bottom) or "black" (Black at bottom)
+    let manualFlip = false;
+    let useHanFont = true;
+    let soundEnabled = true;
+    let shownResultFen = null;
+
+    // Web Audio Synthesizer for wooden click
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioClass) {
+          audioCtx = new AudioClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type = 'move') {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      if (type === 'capture') {
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(50, now + 0.12);
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      } else if (type === 'check') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(587.33, now);
+        osc.frequency.setValueAtTime(783.99, now + 0.09);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else {
+        osc.frequency.setValueAtTime(360, now);
+        osc.frequency.exponentialRampToValueAtTime(90, now + 0.08);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      }
+    }
+
+    // Initialize board
+    renderEmptyBoard();
+    connect();
+
+    // Event Listeners
+    btnCreate.addEventListener("click", () => send({ type: "create_room" }));
+    btnSolo.addEventListener("click", () => send({ type: "create_solo_room" }));
+    btnJoin.addEventListener("click", joinRoom);
+    btnRestart.addEventListener("click", restartGame);
+    btnModalRestart.addEventListener("click", restartGame);
+    btnModalClose.addEventListener("click", () => resultModal.classList.remove("open"));
+
+    roomInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") joinRoom();
+    });
+
+    roomCode.addEventListener("click", () => {
+      if (state?.room) {
+        navigator.clipboard.writeText(state.room);
+        showToast("Đã sao chép mã phòng: " + state.room);
+      }
+    });
+
+    btnToggleSound.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundIcon.textContent = soundEnabled ? "🔊" : "🔇";
+      showToast(soundEnabled ? "Đã bật âm thanh" : "Đã tắt âm thanh");
+    });
+
+    btnToggleFont.addEventListener("click", () => {
+      useHanFont = !useHanFont;
+      fontModeLabel.textContent = useHanFont ? "Tiếng Việt" : "Chữ Hán";
+      renderBoard();
+      showToast(useHanFont ? "Giao diện: Chữ Hán truyền thống" : "Giao diện: Tiếng Việt");
+    });
+
+    btnFlipBoard.addEventListener("click", () => {
+      manualFlip = !manualFlip;
+      ensureBoardOrientation();
+      renderBoard();
+    });
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function connect() {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+      socket.addEventListener("open", () => {
+        connectionStatus.textContent = "Đã kết nối";
+        statusDot.className = "status-dot connected";
+        messageBox.textContent = "Tạo phòng mới hoặc nhập mã phòng để bắt đầu.";
+        updateTurnBanner("Sẵn sàng", "Tạo phòng online hoặc bấm Luyện tập để chơi.", "");
+      });
+
+      socket.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        handleMessage(data);
+      });
+
+      socket.addEventListener("close", () => {
+        connectionStatus.textContent = "Mất kết nối";
+        statusDot.className = "status-dot error";
+        messageBox.textContent = "Mất kết nối tới server. Vui lòng tải lại trang.";
+        updateTurnBanner("Mất kết nối", "Tải lại trang để kết nối lại server.", "warning");
+        setRoomControls(false);
+      });
+    }
+
+    function handleMessage(data) {
+      if (data.type === "room_created" || data.type === "joined") {
+        myMark = data.mark;
+        if (data.mark === "both") {
+          messageBox.textContent = "Đã tạo chế độ luyện tập 2 bên trên cùng máy. Bên Đỏ đi trước!";
+        } else if (data.mark === "viewer") {
+          messageBox.textContent = "Phòng đã đủ 2 người chơi. Bạn đang theo dõi với tư cách khán giả.";
+        } else {
+          messageBox.textContent = data.type === "room_created"
+            ? "Đã tạo phòng. Gửi mã phòng cho đối thủ để bắt đầu!"
+            : "Đã vào phòng. Trận đấu bắt đầu!";
+        }
+        setRoomControls(true);
+        ensureBoardOrientation();
+        return;
+      }
+
+      if (data.type === "state") {
+        const prevFen = state?.fen;
+        state = data;
+        myMark = data.mark || myMark;
+        selectedSquare = null;
+
+        ensureBoardOrientation();
+        renderState();
+
+        if (prevFen && prevFen !== state.fen) {
+          if (state.isCheck) {
+            playSound('check');
+          } else if (state.lastMove && state.lastMove.san && state.lastMove.san.includes('x')) {
+            playSound('capture');
+          } else {
+            playSound('move');
+          }
+        }
+        return;
+      }
+
+      if (data.type === "error") {
+        messageBox.textContent = data.message;
+        showToast(data.message);
+        return;
+      }
+
+      if (data.type === "opponent_left") {
+        messageBox.textContent = `Người chơi ${colorLabel(data.mark)} đã rời phòng.`;
+        showToast(`Người chơi ${colorLabel(data.mark)} đã rời phòng.`);
+      }
+    }
+
+    function joinRoom() {
+      const room = roomInput.value.trim();
+      if (!/^\d{6}$/.test(room)) {
+        messageBox.textContent = "Mã phòng phải gồm đúng 6 chữ số.";
+        showToast("Nhập mã phòng 6 chữ số!");
+        return;
+      }
+      send({ type: "join_room", room });
+    }
+
+    function restartGame() {
+      resultModal.classList.remove("open");
+      shownResultFen = null;
+      send({ type: "restart" });
+    }
+
+    function send(payload) {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        messageBox.textContent = "Chưa kết nối được server.";
+        return;
+      }
+      socket.send(JSON.stringify(payload));
+    }
+
+    function ensureBoardOrientation() {
+      let targetView = myMark === "black" ? "black" : "red";
+      if (manualFlip) {
+        targetView = targetView === "red" ? "black" : "red";
+      }
+
+      if (targetView !== currentView || boardIntersections.children.length === 0) {
+        currentView = targetView;
+        updateCoordLabels();
+        renderEmptyBoard();
+      }
+    }
+
+    function updateCoordLabels() {
+      const ranks = currentView === "red"
+        ? ["10", "9", "8", "7", "6", "5", "4", "3", "2", "1"]
+        : ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+
+      coordLeft.innerHTML = ranks.map((r) => `<span>${r}</span>`).join("");
+      coordRight.innerHTML = ranks.map((r) => `<span>${r}</span>`).join("");
+    }
+
+    function renderEmptyBoard() {
+      boardIntersections.innerHTML = "";
+
+      for (let rank = 1; rank <= BOARD_ROWS; rank++) {
+        for (let col = 0; col < BOARD_COLS; col++) {
+          const square = `${FILES[col]}${rank}`;
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "intersection-point";
+          btn.dataset.col = col;
+          btn.dataset.rank = rank;
+          btn.dataset.square = square;
+
+          const pos = getIntersectionPercent(col, rank);
+          btn.style.left = `${pos.x}%`;
+          btn.style.top = `${pos.y}%`;
+
+          btn.addEventListener("click", () => handleCellClick(square));
+          boardIntersections.appendChild(btn);
+        }
+      }
+    }
+
+    function getIntersectionPercent(col, rank) {
+      if (currentView === "red") {
+        const x = (col / (BOARD_COLS - 1)) * 100;
+        const y = ((10 - rank) / (BOARD_ROWS - 1)) * 100;
+        return { x, y };
+      } else {
+        const x = ((BOARD_COLS - 1 - col) / (BOARD_COLS - 1)) * 100;
+        const y = ((rank - 1) / (BOARD_ROWS - 1)) * 100;
+        return { x, y };
+      }
+    }
+
+    function renderState() {
+      roomCode.textContent = state.room || "-";
+      playerMark.textContent = colorLabel(myMark);
+      turnMark.textContent = colorLabel(state.turn);
+      moveNumber.textContent = state.fullmoveNumber || "-";
+
+      const playerCount = Number(Boolean(state.players?.red)) + Number(Boolean(state.players?.black));
+      const viewerCount = Number(state.viewerCount || 0);
+      playersStatus.textContent = viewerCount > 0
+        ? `${playerCount}/2 · ${viewerCount} khán giả`
+        : `${playerCount}/2`;
+
+      btnRestart.disabled = state.status !== "finished" || myMark === "viewer";
+
+      updatePlayers();
+      updateMessage();
+      renderBoard();
+      updateCapturedPieces();
+      updateHistoryTable();
+      maybeShowResultModal();
+    }
+
+    function updatePlayers() {
+      setPlayerCard("red", redPlayerCard, redMeta, redBadge);
+      setPlayerCard("black", blackPlayerCard, blackMeta, blackBadge);
+    }
+
+    function setPlayerCard(color, card, meta, badge) {
+      const connected = Boolean(state.players?.[color]);
+      const isTurn = state.status === "playing" && state.turn === color;
+
+      card.classList.toggle("active", isTurn);
+      meta.textContent = connected ? playerDescription(color) : "Đang chờ đối thủ...";
+
+      if (isTurn) {
+        badge.textContent = "Đang đi";
+        badge.className = `badge ${color === "red" ? "turn-red" : "turn-black"}`;
+      } else if (connected) {
+        badge.textContent = "Sẵn sàng";
+        badge.className = "badge";
+      } else {
+        badge.textContent = "Chờ";
+        badge.className = "badge waiting";
+      }
+    }
+
+    function updateMessage() {
+      if (!state) return;
+
+      if (state.status === "waiting") {
+        messageBox.textContent = "Đang chờ đối thủ vào phòng. Bạn hãy gửi mã phòng cho bạn bè!";
+        updateTurnBanner("Đang chờ đối thủ", "Gửi mã phòng để bắt đầu trận đấu.", "warning");
+        checkAlert.style.display = "none";
+        return;
+      }
+
+      if (state.status === "finished") {
+        const summary = resultSummary();
+        messageBox.textContent = summary.detail;
+        updateTurnBanner(summary.title, summary.detail, "finished");
+        checkAlert.style.display = "none";
+        return;
+      }
+
+      if (state.isCheck) {
+        const checkedSide = colorLabel(state.turn);
+        const title = state.turn === myMark ? "Bạn đang bị CHIẾU TƯỚNG!" : `${checkedSide} đang bị CHIẾU TƯỚNG!`;
+        updateTurnBanner(title, "Hãy cản chiếu hoặc chạy tướng ngay!", "warning");
+        messageBox.textContent = title;
+        checkAlert.style.display = "block";
+        return;
+      }
+
+      checkAlert.style.display = "none";
+      if (myMark === "both") {
+        updateTurnBanner(`Luyện tập: Đến lượt bên ${colorLabel(state.turn)}`, `Chọn quân ${colorLabel(state.turn)} để thực hiện nước đi.`, "my-turn");
+        messageBox.textContent = `Chế độ 2 bên: Đến lượt bên ${colorLabel(state.turn)}.`;
+      } else if (state.turn === myMark) {
+        updateTurnBanner("Đến lượt bạn", `Bạn cầm quân ${colorLabel(myMark)}. Hãy chọn quân và đi tiếp.`, "my-turn");
+        messageBox.textContent = "Đến lượt bạn đi nước tiếp theo.";
+      } else if (myMark === "viewer") {
+        updateTurnBanner("Đang theo dõi", `Bên ${colorLabel(state.turn)} đang suy nghĩ nước đi...`, "");
+        messageBox.textContent = "Bạn là khán giả đang theo dõi ván cờ realtime.";
+      } else {
+        updateTurnBanner(`Đến lượt ${colorLabel(state.turn)}`, `Đang chờ đối thủ ${colorLabel(state.turn)} đi quân...`, "");
+        messageBox.textContent = `Đang chờ ${colorLabel(state.turn)}.`;
+      }
+    }
+
+    function updateTurnBanner(title, detail, className) {
+      turnTitle.textContent = title;
+      turnDetail.textContent = detail;
+      turnBanner.className = `turn-banner ${className}`.trim();
+    }
+
+    function renderBoard() {
+      const legalTargets = new Set(movesFromSelected().map((m) => m.to));
+      const lastSquares = lastMoveSquares();
+
+      for (const btn of boardIntersections.children) {
+        const square = btn.dataset.square;
+        const piece = pieceAt(square);
+
+        btn.innerHTML = "";
+        btn.className = "intersection-point";
+
+        if (piece) {
+          const token = document.createElement("div");
+          token.className = `piece-token ${piece.color} ${useHanFont ? "" : "latin"}`.trim();
+          token.textContent = useHanFont ? piece.han : piece.name;
+          btn.appendChild(token);
+
+          if (piece.type === "K" && state?.isCheck && state.turn === piece.color) {
+            btn.classList.add("in-check");
+          }
+        }
+
+        if (lastSquares.has(square)) {
+          btn.classList.add("last-move");
+        }
+
+        if (square === selectedSquare) {
+          btn.classList.add("selected");
+        }
+
+        if (legalTargets.has(square)) {
+          btn.classList.add(piece ? "capture" : "legal");
+        }
+
+        if (!canInteractWithBoard()) {
+          btn.classList.add("disabled");
+        }
+      }
+    }
+
+    function handleCellClick(square) {
+      if (!canInteractWithBoard()) return;
+
+      const piece = pieceAt(square);
+
+      if (!selectedSquare) {
+        selectOwnPiece(square, piece);
+        return;
+      }
+
+      if (square === selectedSquare) {
+        selectedSquare = null;
+        renderBoard();
+        return;
+      }
+
+      const matchingMoves = movesFromSelected().filter((m) => m.to === square);
+      if (matchingMoves.length > 0) {
+        send({ type: "move", from: selectedSquare, to: square });
+        selectedSquare = null;
+        renderBoard();
+        return;
+      }
+
+      const ownColor = myMark === "both" ? state.turn : myMark;
+      if (piece?.color === ownColor) {
+        selectOwnPiece(square, piece);
+        return;
+      }
+
+      selectedSquare = null;
+      renderBoard();
+    }
+
+    function selectOwnPiece(square, piece) {
+      if (!piece) {
+        selectedSquare = null;
+        renderBoard();
+        return;
+      }
+      const ownColor = myMark === "both" ? state.turn : myMark;
+      if (piece.color !== ownColor) {
+        selectedSquare = null;
+        renderBoard();
+        return;
+      }
+      selectedSquare = square;
+      renderBoard();
+    }
+
+    function movesFromSelected() {
+      if (!state || !selectedSquare) return [];
+      return (state.legalMoves || []).filter((m) => m.from === selectedSquare);
+    }
+
+    function canInteractWithBoard() {
+      return Boolean(
+        state &&
+        state.status === "playing" &&
+        (myMark === "both" || (myMark !== "viewer" && state.turn === myMark))
+      );
+    }
+
+    function pieceAt(square) {
+      if (!state?.board) return null;
+      for (const row of state.board) {
+        for (const piece of row) {
+          if (piece?.square === square) return piece;
+        }
+      }
+      return null;
+    }
+
+    function lastMoveSquares() {
+      if (!state?.lastMove) return new Set();
+      return new Set([state.lastMove.from, state.lastMove.to]);
+    }
+
+    function updateCapturedPieces() {
+      if (!state?.moveHistory) return;
+
+      const startCounts = {
+        r: 2, n: 2, b: 2, a: 2, k: 1, c: 2, p: 5,
+        R: 2, N: 2, B: 2, A: 2, K: 1, C: 2, P: 5,
+      };
+
+      const currentCounts = {};
+      if (state.board) {
+        for (const row of state.board) {
+          for (const p of row) {
+            if (p) {
+              currentCounts[p.symbol] = (currentCounts[p.symbol] || 0) + 1;
+            }
+          }
+        }
+      }
+
+      const blackCaptured = [];
+      const redCaptured = [];
+
+      for (const [sym, count] of Object.entries(startCounts)) {
+        const cur = currentCounts[sym] || 0;
+        const missing = count - cur;
+        for (let i = 0; i < missing; i++) {
+          if (sym === sym.toUpperCase()) {
+            blackCaptured.push(sym);
+          } else {
+            redCaptured.push(sym);
+          }
+        }
+      }
+
+      renderCapturedList(redCapturedList, redCaptured, "black");
+      renderCapturedList(blackCapturedList, blackCaptured, "red");
+    }
+
+    function renderCapturedList(container, pieces, color) {
+      if (pieces.length === 0) {
+        container.innerHTML = '<span style="color: #94a3b8; font-size: 12px;">Chưa có</span>';
+        return;
+      }
+
+      container.innerHTML = "";
+      for (const p of pieces) {
+        const chip = document.createElement("span");
+        chip.className = `captured-chip ${color}`;
+        chip.textContent = useHanFont ? PIECE_CHARS_HAN[p] : PIECE_NAMES_VI[p][0];
+        chip.title = PIECE_NAMES_VI[p];
+        container.appendChild(chip);
+      }
+    }
+
+    function updateHistoryTable() {
+      if (!state?.moveHistory || state.moveHistory.length === 0) {
+        moveHistoryBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 14px;">Chưa có nước đi</td></tr>';
+        return;
+      }
+
+      const rows = [];
+      let currentRound = [];
+
+      for (let i = 0; i < state.moveHistory.length; i++) {
+        const move = state.moveHistory[i];
+        if (move.color === "red") {
+          currentRound = [move, null];
+          rows.push(currentRound);
+        } else {
+          if (currentRound.length > 0 && currentRound[1] === null) {
+            currentRound[1] = move;
+          } else {
+            rows.push([null, move]);
+          }
+        }
+      }
+
+      moveHistoryBody.innerHTML = "";
+      rows.forEach((round, idx) => {
+        const tr = document.createElement("tr");
+        const isLatest = idx === rows.length - 1;
+        if (isLatest) tr.className = "latest";
+
+        const tdNum = document.createElement("td");
+        tdNum.textContent = idx + 1;
+
+        const tdRed = document.createElement("td");
+        tdRed.textContent = round[0]?.san || "-";
+
+        const tdBlack = document.createElement("td");
+        tdBlack.textContent = round[1]?.san || "-";
+
+        tr.appendChild(tdNum);
+        tr.appendChild(tdRed);
+        tr.appendChild(tdBlack);
+        moveHistoryBody.appendChild(tr);
+      });
+
+      const wrap = moveHistoryBody.parentElement.parentElement;
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+
+    function maybeShowResultModal() {
+      if (state.status !== "finished" || shownResultFen === state.fen) {
+        return;
+      }
+
+      const summary = resultSummary();
+      modalTitle.textContent = summary.title;
+      modalDetail.textContent = summary.detail;
+      modalIcon.textContent = state.winner === myMark ? "🏆" : state.winner ? "👑" : "🤝";
+      resultModal.classList.add("open");
+      shownResultFen = state.fen;
+    }
+
+    function resultSummary() {
+      const reason = RESULT_TEXTS[state.resultReason] || "Ván cờ kết thúc";
+      if (state.winner) {
+        const won = state.winner === myMark;
+        const winnerName = colorLabel(state.winner);
+        return {
+          title: won ? "CHIẾN THẮNG!" : `${winnerName} thắng cuộc!`,
+          detail: `${reason}. Bên ${winnerName} đã giành chiến thắng thuyết phục.`,
+        };
+      }
+
+      return {
+        title: "Ván cờ Hòa",
+        detail: reason,
+      };
+    }
+
+    function playerDescription(color) {
+      if (myMark === "both") return color === "red" ? "Người chơi Đỏ" : "Người chơi Đen";
+      if (myMark === "viewer") return "Người chơi";
+      return color === myMark ? "Bạn" : "Đối thủ";
+    }
+
+    function setRoomControls(inRoom) {
+      btnCreate.disabled = inRoom;
+      btnSolo.disabled = inRoom;
+      btnJoin.disabled = inRoom;
+      roomInput.disabled = inRoom;
+    }
+
+    function colorLabel(color) {
+      return COLOR_LABELS[color] || "-";
+    }
+  </script>
+</body>
+</html>
