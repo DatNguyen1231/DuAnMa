@@ -788,6 +788,30 @@
       letter-spacing: -0.2px;
     }
 
+    /* Western chess symbols style */
+    .piece-token.western {
+      font-family: 'Outfit', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .piece-token.western .piece-icon {
+      font-size: clamp(17px, 3.4vw, 27px);
+      line-height: 1;
+    }
+
+    .piece-token.western .piece-sub-badge {
+      font-family: 'Cinzel', 'Outfit', sans-serif;
+      font-size: clamp(8.5px, 1.4vw, 11px);
+      font-weight: 900;
+      line-height: 1;
+      margin-top: 1px;
+      opacity: 0.9;
+    }
+
     .intersection-point:hover .piece-token {
       transform: scale(1.08);
       box-shadow:
@@ -1072,6 +1096,253 @@
         justify-content: space-between;
       }
     }
+
+    /* Dark Theme Styles */
+    body.dark-theme {
+      color: #f1f5f9;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(201, 42, 42, 0.18), transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(197, 155, 39, 0.15), transparent 45%),
+        linear-gradient(145deg, #0b0f19 0%, #111827 50%, #0d131f 100%);
+    }
+
+    body.dark-theme h1 {
+      color: #f8fafc;
+    }
+
+    body.dark-theme .subtitle {
+      color: #94a3b8;
+    }
+
+    body.dark-theme .btn-tool {
+      background: #1e293b;
+      border-color: #475569;
+      color: #f1f5f9;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-theme .btn-tool:hover {
+      background: #334155;
+      border-color: #64748b;
+    }
+
+    body.dark-theme .connection-badge {
+      background: #1e293b;
+      border-color: #475569;
+      color: #f1f5f9;
+    }
+
+    body.dark-theme .panel {
+      background: rgba(19, 26, 42, 0.94);
+      border-color: #334155;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark-theme .panel h2 {
+      color: #f8fafc;
+    }
+
+    body.dark-theme input {
+      background: #0f172a;
+      border-color: #475569;
+      color: #f8fafc;
+    }
+
+    body.dark-theme input:focus {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+    }
+
+    body.dark-theme .btn-restart {
+      background: #1e293b;
+      border-color: #475569;
+      color: #cbd5e1;
+    }
+
+    body.dark-theme .btn-restart:hover:not(:disabled) {
+      background: #334155;
+      border-color: #64748b;
+    }
+
+    body.dark-theme .status-list {
+      background: #0f172a;
+      border-color: #334155;
+    }
+
+    body.dark-theme .status-row {
+      border-color: #1e293b;
+    }
+
+    body.dark-theme .status-row span:first-child {
+      color: #94a3b8;
+    }
+
+    body.dark-theme .status-row strong {
+      color: #f8fafc;
+    }
+
+    body.dark-theme .room-code-tag {
+      color: #f87171;
+    }
+
+    body.dark-theme .player-card {
+      background: #131c2e;
+      border-color: #334155;
+    }
+
+    body.dark-theme .player-name {
+      color: #f8fafc;
+    }
+
+    body.dark-theme .player-card.active {
+      background: #241417;
+      border-color: #ef4444;
+    }
+
+    body.dark-theme .player-card.active.black-side {
+      background: #172033;
+      border-color: #60a5fa;
+    }
+
+    body.dark-theme .badge.waiting {
+      background: #1e293b;
+      color: #94a3b8;
+    }
+
+    body.dark-theme .badge.turn-black {
+      background: #1e293b;
+      color: #f8fafc;
+      border-color: #475569;
+    }
+
+    body.dark-theme .message {
+      background: #0f172a;
+      border-color: #334155;
+      color: #cbd5e1;
+    }
+
+    body.dark-theme .captured-row {
+      background: #0f172a;
+      border-color: #334155;
+    }
+
+    body.dark-theme .captured-chip {
+      background: #1e293b;
+      border-color: #475569;
+    }
+
+    body.dark-theme .captured-chip.black {
+      color: #f1f5f9;
+    }
+
+    body.dark-theme .history-wrap {
+      background: #0f172a;
+      border-color: #334155;
+    }
+
+    body.dark-theme .history-table th {
+      background: #1e293b;
+      color: #cbd5e1;
+      border-color: #334155;
+    }
+
+    body.dark-theme .history-table td {
+      border-color: #1e293b;
+      color: #cbd5e1;
+    }
+
+    body.dark-theme .history-table tr:hover {
+      background: #1e293b;
+    }
+
+    body.dark-theme .history-table tr.latest {
+      background: rgba(220, 38, 38, 0.22);
+    }
+
+    body.dark-theme .bot-panel {
+      background: #062817;
+      border-color: #059669;
+    }
+
+    body.dark-theme .bot-title {
+      color: #34d399;
+    }
+
+    body.dark-theme .bot-form-group label {
+      color: #a7f3d0;
+    }
+
+    body.dark-theme .bot-select {
+      background: #0f172a;
+      border-color: #059669;
+      color: #f1f5f9;
+    }
+
+    body.dark-theme .btn-bot-action.secondary {
+      background: #1e293b;
+      border-color: #475569;
+      color: #cbd5e1;
+    }
+
+    body.dark-theme .btn-bot-action.secondary:hover:not(:disabled) {
+      background: #334155;
+      border-color: #64748b;
+    }
+
+    body.dark-theme .modal-card {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #475569;
+    }
+
+    body.dark-theme .modal-card h2 {
+      color: #f8fafc;
+    }
+
+    body.dark-theme .modal-card p {
+      color: #cbd5e1;
+    }
+
+    body.dark-theme .board-wrapper-card {
+      background: #1b0c03;
+      border-color: #b45309;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+    }
+
+    body.dark-theme .coord-labels-top,
+    body.dark-theme .coord-labels-bottom,
+    body.dark-theme .coord-labels-left,
+    body.dark-theme .coord-labels-right {
+      color: #fef08a;
+    }
+
+    /* PGN Modal */
+    .pgn-modal-card {
+      width: min(580px, calc(100vw - 32px));
+      text-align: left;
+    }
+
+    .pgn-textarea {
+      width: 100%;
+      height: 220px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 12.5px;
+      line-height: 1.5;
+      padding: 10px 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #0f172a;
+      resize: vertical;
+      outline: none;
+      white-space: pre-wrap;
+    }
+
+    body.dark-theme .pgn-textarea {
+      background: #0f172a;
+      border-color: #334155;
+      color: #f1f5f9;
+    }
   </style>
 </head>
 <body>
@@ -1086,11 +1357,14 @@
       </div>
 
       <div class="top-actions">
+        <button id="btnToggleTheme" class="btn-tool" title="Chuyển chế độ Giao diện Sáng / Tối">
+          <span id="themeIcon">🌙</span> <span id="themeLabel">Tối</span>
+        </button>
         <button id="btnToggleSound" class="btn-tool" title="Bật/Tắt âm thanh">
           <span id="soundIcon">🔊</span> Âm thanh
         </button>
-        <button id="btnToggleFont" class="btn-tool" title="Đổi giao diện quân cờ">
-          🀄 <span id="fontModeLabel">Tiếng Việt</span>
+        <button id="btnToggleFont" class="btn-tool" title="Đổi giao diện quân cờ: Chữ Hán / Biểu tượng Tây / Tiếng Việt">
+          <span id="fontModeIcon">🀄</span> <span id="fontModeLabel">Chữ Hán</span>
         </button>
         <button id="btnFlipBoard" class="btn-tool" title="Xoay đổi chiều bàn cờ">
           🔄 Đảo bàn cờ
@@ -1112,7 +1386,10 @@
             <button id="btnSolo" class="btn-solo">Luyện tập & Đấu với Bot</button>
             <input id="roomInput" type="text" inputmode="numeric" maxlength="6" placeholder="Nhập mã phòng 6 số">
             <button id="btnJoin" class="btn-secondary">Vào phòng</button>
-            <button id="btnRestart" class="btn-restart" disabled>Chơi lại ván mới</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button id="btnUndo" class="btn-restart" disabled title="Đi lại nước cờ (Undo)">↩️ Đi lại cờ</button>
+              <button id="btnRestart" class="btn-restart" disabled>Chơi ván mới</button>
+            </div>
           </div>
 
           <!-- Panel Cấu hình Bot & Luyện tập -->
@@ -1152,12 +1429,15 @@
               </select>
             </div>
 
-            <div class="bot-actions-row">
+            <div class="bot-actions-row" style="grid-template-columns: 1fr 1fr 1fr;">
               <button id="btnBotHint" type="button" class="btn-bot-action" title="Nhờ Bot tính toán và đi ngay một nước tối ưu">
-                💡 Bot đi hộ 1 nước
+                💡 Đi hộ
+              </button>
+              <button id="btnBotUndo" type="button" class="btn-bot-action secondary" title="Đi lại nước cờ (Undo)">
+                ↩️ Undo
               </button>
               <button id="btnBotPauseToggle" type="button" class="btn-bot-action secondary" title="Tạm dừng hoặc tiếp tục chế độ tự động chơi">
-                ⏸️ Tạm dừng
+                ⏸️ Dừng
               </button>
             </div>
           </div>
@@ -1421,6 +1701,9 @@
               </tbody>
             </table>
           </div>
+          <button id="btnExportPgn" class="btn-tool" style="width: 100%; margin-top: 10px; justify-content: center; font-weight: 700;" title="Xuất biên bản trận đấu định dạng PGN">
+            📋 Xuất biên bản PGN
+          </button>
         </section>
       </aside>
     </div>
@@ -1435,6 +1718,36 @@
       <div class="modal-actions">
         <button id="btnModalRestart" class="btn-primary">Chơi ván mới</button>
         <button id="btnModalClose" class="btn-restart">Xem bàn cờ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PGN Export Modal -->
+  <div id="pgnModal" class="modal-backdrop">
+    <div class="modal-card pgn-modal-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <h2 style="margin: 0; font-size: 19px; display: flex; align-items: center; gap: 8px;">
+          📋 Biên bản trận đấu PGN
+        </h2>
+        <button id="btnPgnCloseX" class="btn-tool" style="padding: 4px 10px; font-weight: 800;">✕</button>
+      </div>
+      <p style="font-size: 13px; text-align: left; margin-bottom: 10px; color: var(--text-muted);">
+        Định dạng Xiangqi PGN tiêu chuẩn quốc tế, tương thích với CCBridge, Sauron, Wukong, ChessBase, Lichess, v.v.
+      </p>
+
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 13px; text-align: left;">
+        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+          <input type="checkbox" id="pgnIncludeSanCheck" checked style="width: 16px; height: 16px;">
+          Kèm chú thích nước đi tiếng Việt {SAN}
+        </label>
+      </div>
+
+      <textarea id="pgnTextArea" readonly class="pgn-textarea"></textarea>
+
+      <div class="modal-actions" style="margin-top: 14px; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+        <button id="btnCopyPgn" class="btn-primary" style="font-size: 13px;">📋 Sao chép</button>
+        <button id="btnDownloadPgn" class="btn-secondary" style="font-size: 13px;">💾 Tải file .pgn</button>
+        <button id="btnPgnClose" class="btn-restart" style="font-size: 13px;">Đóng</button>
       </div>
     </div>
   </div>
@@ -1455,6 +1768,23 @@
     const PIECE_CHARS_HAN = {
       K: "帥", A: "仕", B: "相", N: "傌", R: "俥", C: "炮", P: "兵",
       k: "將", a: "士", b: "象", n: "馬", r: "車", c: "砲", p: "卒",
+    };
+
+    const PIECE_SYMBOLS_WESTERN = {
+      K: { icon: "♔", label: "K" },
+      A: { icon: "🛡️", label: "A" },
+      B: { icon: "🐘", label: "B" },
+      N: { icon: "♞", label: "N" },
+      R: { icon: "♜", label: "R" },
+      C: { icon: "💣", label: "C" },
+      P: { icon: "♟", label: "P" },
+      k: { icon: "♚", label: "k" },
+      a: { icon: "🛡️", label: "a" },
+      b: { icon: "🐘", label: "b" },
+      n: { icon: "♞", label: "n" },
+      r: { icon: "♜", label: "r" },
+      c: { icon: "💣", label: "c" },
+      p: { icon: "♟", label: "p" },
     };
 
     const COLOR_LABELS = {
@@ -1509,11 +1839,31 @@
     const btnToggleSound = document.getElementById("btnToggleSound");
     const soundIcon = document.getElementById("soundIcon");
     const btnToggleFont = document.getElementById("btnToggleFont");
+    const fontModeIcon = document.getElementById("fontModeIcon");
     const fontModeLabel = document.getElementById("fontModeLabel");
+    const btnToggleTheme = document.getElementById("btnToggleTheme");
+    const themeIcon = document.getElementById("themeIcon");
+    const themeLabel = document.getElementById("themeLabel");
     const btnFlipBoard = document.getElementById("btnFlipBoard");
     const coordLeft = document.getElementById("coordLeft");
     const coordRight = document.getElementById("coordRight");
+    const coordTop = document.getElementById("coordTop");
+    const coordBottom = document.getElementById("coordBottom");
     const toast = document.getElementById("toast");
+
+    // Undo DOM Elements
+    const btnUndo = document.getElementById("btnUndo");
+    const btnBotUndo = document.getElementById("btnBotUndo");
+
+    // PGN Export DOM Elements
+    const btnExportPgn = document.getElementById("btnExportPgn");
+    const pgnModal = document.getElementById("pgnModal");
+    const pgnTextArea = document.getElementById("pgnTextArea");
+    const pgnIncludeSanCheck = document.getElementById("pgnIncludeSanCheck");
+    const btnCopyPgn = document.getElementById("btnCopyPgn");
+    const btnDownloadPgn = document.getElementById("btnDownloadPgn");
+    const btnPgnClose = document.getElementById("btnPgnClose");
+    const btnPgnCloseX = document.getElementById("btnPgnCloseX");
 
     // Bot AI & Practice Mode DOM Elements
     const botControlPanel = document.getElementById("botControlPanel");
@@ -1531,7 +1881,8 @@
     let selectedSquare = null;
     let currentView = "red"; // "red" (Red at bottom) or "black" (Black at bottom)
     let manualFlip = false;
-    let useHanFont = true;
+    let pieceStyleMode = localStorage.getItem("xiangqi_piece_style") || "han"; // "han" | "western" | "viet"
+    let themeMode = localStorage.getItem("xiangqi_theme") || "light"; // "light" | "dark"
     let soundEnabled = true;
     let shownResultFen = null;
 
@@ -1600,7 +1951,8 @@
       }
     }
 
-    // Initialize board
+    // Initialize board & appearance
+    initThemeAndStyle();
     renderEmptyBoard();
     connect();
 
@@ -1609,6 +1961,8 @@
     btnSolo.addEventListener("click", () => send({ type: "create_solo_room" }));
     btnJoin.addEventListener("click", joinRoom);
     btnRestart.addEventListener("click", restartGame);
+    if (btnUndo) btnUndo.addEventListener("click", handleUndo);
+    if (btnBotUndo) btnBotUndo.addEventListener("click", handleUndo);
     btnModalRestart.addEventListener("click", restartGame);
     btnModalClose.addEventListener("click", () => resultModal.classList.remove("open"));
 
@@ -1629,18 +1983,24 @@
       showToast(soundEnabled ? "Đã bật âm thanh" : "Đã tắt âm thanh");
     });
 
-    btnToggleFont.addEventListener("click", () => {
-      useHanFont = !useHanFont;
-      fontModeLabel.textContent = useHanFont ? "Tiếng Việt" : "Chữ Hán";
-      renderBoard();
-      showToast(useHanFont ? "Giao diện: Chữ Hán truyền thống" : "Giao diện: Tiếng Việt");
-    });
+    if (btnToggleTheme) btnToggleTheme.addEventListener("click", toggleTheme);
+
+    if (btnToggleFont) btnToggleFont.addEventListener("click", cyclePieceStyle);
 
     btnFlipBoard.addEventListener("click", () => {
       manualFlip = !manualFlip;
       ensureBoardOrientation();
       renderBoard();
+      showToast(currentView === "black" ? "Bàn cờ: Góc nhìn bên Đen" : "Bàn cờ: Góc nhìn bên Đỏ");
     });
+
+    // PGN Modal Listeners
+    if (btnExportPgn) btnExportPgn.addEventListener("click", openPgnModal);
+    if (btnPgnClose) btnPgnClose.addEventListener("click", closePgnModal);
+    if (btnPgnCloseX) btnPgnCloseX.addEventListener("click", closePgnModal);
+    if (btnCopyPgn) btnCopyPgn.addEventListener("click", copyPgn);
+    if (btnDownloadPgn) btnDownloadPgn.addEventListener("click", downloadPgn);
+    if (pgnIncludeSanCheck) pgnIncludeSanCheck.addEventListener("change", updatePgnText);
 
     // Bot AI Event Listeners
     practiceModeSelect.addEventListener("change", (e) => {
@@ -1914,6 +2274,255 @@
       send({ type: "restart" });
     }
 
+    function handleUndo() {
+      if (!state || !state.moveHistory || state.moveHistory.length === 0) {
+        showToast("Chưa có nước cờ nào để đi lại!");
+        return;
+      }
+      if (myMark !== "both") {
+        showToast("Tính năng đi lại cờ chỉ hỗ trợ trong chế độ Luyện tập / Đấu với máy!");
+        return;
+      }
+
+      if (botTimer) {
+        clearTimeout(botTimer);
+        botTimer = null;
+      }
+      updateBotThinkingUI(false);
+
+      let steps = 1;
+      const vsBot = (practiceMode === "human_vs_bot_red" || practiceMode === "bot_vs_human_black");
+      if (vsBot) {
+        const isHumanTurn = (practiceMode === "human_vs_bot_red" && state.turn === "red") ||
+                            (practiceMode === "bot_vs_human_black" && state.turn === "black");
+        if (isHumanTurn && state.moveHistory.length >= 2) {
+          steps = 2;
+        } else {
+          steps = 1;
+        }
+      }
+
+      send({ type: "undo", steps });
+      showToast(steps === 2 ? "Đã quay lại 1 vòng nước đi" : "Đã quay lại 1 nước đi");
+    }
+
+    // Theme & Style Functions
+    function initThemeAndStyle() {
+      if (themeMode === "dark") {
+        document.body.classList.add("dark-theme");
+        if (themeIcon) themeIcon.textContent = "☀️";
+        if (themeLabel) themeLabel.textContent = "Sáng";
+      } else {
+        document.body.classList.remove("dark-theme");
+        if (themeIcon) themeIcon.textContent = "🌙";
+        if (themeLabel) themeLabel.textContent = "Tối";
+      }
+      updatePieceStyleButtonUI();
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle("dark-theme");
+      themeMode = isDark ? "dark" : "light";
+      localStorage.setItem("xiangqi_theme", themeMode);
+      if (themeIcon) themeIcon.textContent = isDark ? "☀️" : "🌙";
+      if (themeLabel) themeLabel.textContent = isDark ? "Sáng" : "Tối";
+      showToast(isDark ? "Đã chuyển sang giao diện Tối" : "Đã chuyển sang giao diện Sáng");
+    }
+
+    function cyclePieceStyle() {
+      if (pieceStyleMode === "han") {
+        pieceStyleMode = "western";
+      } else if (pieceStyleMode === "western") {
+        pieceStyleMode = "viet";
+      } else {
+        pieceStyleMode = "han";
+      }
+      localStorage.setItem("xiangqi_piece_style", pieceStyleMode);
+      updatePieceStyleButtonUI();
+      renderBoard();
+      updateCapturedPieces();
+      updatePlayerAvatars();
+
+      const labels = {
+        han: "Chữ Hán truyền thống",
+        western: "Biểu tượng phương Tây (Quốc tế)",
+        viet: "Phiên âm Tiếng Việt",
+      };
+      showToast(`Giao diện quân cờ: ${labels[pieceStyleMode]}`);
+    }
+
+    function updatePieceStyleButtonUI() {
+      if (!fontModeIcon || !fontModeLabel) return;
+      if (pieceStyleMode === "han") {
+        fontModeIcon.textContent = "🀄";
+        fontModeLabel.textContent = "Chữ Hán";
+      } else if (pieceStyleMode === "western") {
+        fontModeIcon.textContent = "♔";
+        fontModeLabel.textContent = "Phương Tây";
+      } else {
+        fontModeIcon.textContent = "🇻🇳";
+        fontModeLabel.textContent = "Tiếng Việt";
+      }
+    }
+
+    function updatePlayerAvatars() {
+      const redAvatar = document.querySelector("#redPlayerCard .player-piece-avatar");
+      const blackAvatar = document.querySelector("#blackPlayerCard .player-piece-avatar");
+      if (redAvatar && blackAvatar) {
+        if (pieceStyleMode === "western") {
+          redAvatar.innerHTML = "♔";
+          blackAvatar.innerHTML = "♚";
+          redAvatar.style.fontSize = "26px";
+          blackAvatar.style.fontSize = "26px";
+        } else if (pieceStyleMode === "viet") {
+          redAvatar.innerHTML = "TƯỚNG";
+          blackAvatar.innerHTML = "TƯỚNG";
+          redAvatar.style.fontSize = "11px";
+          blackAvatar.style.fontSize = "11px";
+        } else {
+          redAvatar.innerHTML = "帥";
+          blackAvatar.innerHTML = "將";
+          redAvatar.style.fontSize = "24px";
+          blackAvatar.style.fontSize = "24px";
+        }
+      }
+    }
+
+    // PGN Export Functions
+    function openPgnModal() {
+      if (!state) {
+        showToast("Chưa có thông tin ván cờ.");
+        return;
+      }
+      updatePgnText();
+      pgnModal.classList.add("open");
+    }
+
+    function closePgnModal() {
+      pgnModal.classList.remove("open");
+    }
+
+    function updatePgnText() {
+      const includeSan = pgnIncludeSanCheck ? pgnIncludeSanCheck.checked : true;
+      pgnTextArea.value = generatePgn(includeSan);
+    }
+
+    function copyPgn() {
+      if (!pgnTextArea.value) updatePgnText();
+      navigator.clipboard.writeText(pgnTextArea.value).then(() => {
+        showToast("Đã sao chép biên bản PGN!");
+      }).catch(() => {
+        pgnTextArea.select();
+        document.execCommand("copy");
+        showToast("Đã sao chép PGN!");
+      });
+    }
+
+    function downloadPgn() {
+      if (!pgnTextArea.value) updatePgnText();
+      const content = pgnTextArea.value;
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const filename = `cotuong_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}.pgn`;
+
+      const blob = new Blob([content], { type: "application/x-chess-pgn;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Đã tải file: ${filename}`);
+    }
+
+    function generatePgn(includeSan = true) {
+      if (!state) return "";
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const dateStr = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}`;
+
+      let redName = "Người chơi Đỏ";
+      let blackName = "Người chơi Đen";
+
+      if (myMark === "both") {
+        const diffText = botDifficultySelect.options[botDifficultySelect.selectedIndex]?.text.split("(")[0].trim() || `Cấp ${botDifficulty}`;
+        if (practiceMode === "human_vs_bot_red") {
+          redName = "Bạn (Người chơi)";
+          blackName = `Bot AI (${diffText})`;
+        } else if (practiceMode === "bot_vs_human_black") {
+          redName = `Bot AI (${diffText})`;
+          blackName = "Bạn (Người chơi)";
+        } else if (practiceMode === "bot_vs_bot") {
+          redName = `Bot Đỏ (${diffText})`;
+          blackName = `Bot Đen (${diffText})`;
+        } else {
+          redName = "Luyện tập (Đỏ)";
+          blackName = "Luyện tập (Đen)";
+        }
+      } else if (myMark === "red") {
+        redName = "Bạn (Đỏ)";
+        blackName = "Đối thủ (Đen)";
+      } else if (myMark === "black") {
+        redName = "Đối thủ (Đỏ)";
+        blackName = "Bạn (Đen)";
+      }
+
+      let resultTag = "*";
+      if (state.status === "finished") {
+        if (state.winner === "red") resultTag = "1-0";
+        else if (state.winner === "black") resultTag = "0-1";
+        else resultTag = "1/2-1/2";
+      }
+
+      const startFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
+
+      let pgn = "";
+      pgn += `[Event "Cờ Tướng Online - Trận đấu"]\n`;
+      pgn += `[Site "Co Tuong Realtime GUI"]\n`;
+      pgn += `[Date "${dateStr}"]\n`;
+      pgn += `[Round "1"]\n`;
+      pgn += `[Red "${redName}"]\n`;
+      pgn += `[Black "${blackName}"]\n`;
+      pgn += `[Result "${resultTag}"]\n`;
+      pgn += `[Format "Xiangqi"]\n`;
+      pgn += `[FEN "${startFen}"]\n\n`;
+
+      if (!state.moveHistory || state.moveHistory.length === 0) {
+        pgn += resultTag;
+        return pgn;
+      }
+
+      let moveText = "";
+      let currentRoundNum = 1;
+      let hasRedInRound = false;
+
+      for (let i = 0; i < state.moveHistory.length; i++) {
+        const m = state.moveHistory[i];
+        const uci = m.uci || `${m.from}${m.to}`;
+        const san = includeSan && m.san ? ` {${m.san}}` : "";
+
+        if (m.color === "red") {
+          if (moveText.length > 0) moveText += " ";
+          moveText += `${currentRoundNum}. ${uci}${san}`;
+          hasRedInRound = true;
+        } else {
+          if (!hasRedInRound) {
+            if (moveText.length > 0) moveText += " ";
+            moveText += `${currentRoundNum}... ${uci}${san}`;
+          } else {
+            moveText += ` ${uci}${san}`;
+          }
+          currentRoundNum++;
+          hasRedInRound = false;
+        }
+      }
+
+      pgn += `${moveText} ${resultTag}`;
+      return pgn;
+    }
+
     function send(payload) {
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         messageBox.textContent = "Chưa kết nối được server.";
@@ -1945,6 +2554,12 @@
 
       coordLeft.innerHTML = ranks.map((r) => `<span>${r}</span>`).join("");
       coordRight.innerHTML = ranks.map((r) => `<span>${r}</span>`).join("");
+
+      const files = currentView === "red"
+        ? ["a", "b", "c", "d", "e", "f", "g", "h", "i"]
+        : ["i", "h", "g", "f", "e", "d", "c", "b", "a"];
+      if (coordTop) coordTop.innerHTML = files.map((f) => `<span>${f}</span>`).join("");
+      if (coordBottom) coordBottom.innerHTML = files.map((f) => `<span>${f}</span>`).join("");
     }
 
     function renderEmptyBoard() {
@@ -1995,7 +2610,11 @@
         : `${playerCount}/2`;
 
       btnRestart.disabled = (myMark !== "both" && state.status !== "finished") || myMark === "viewer";
+      const canUndo = myMark === "both" && Boolean(state?.moveHistory && state.moveHistory.length > 0);
+      if (btnUndo) btnUndo.disabled = !canUndo;
+      if (btnBotUndo) btnBotUndo.disabled = !canUndo;
 
+      updatePlayerAvatars();
       updatePlayers();
       updateMessage();
       renderBoard();
@@ -2097,8 +2716,17 @@
 
         if (piece) {
           const token = document.createElement("div");
-          token.className = `piece-token ${piece.color} ${useHanFont ? "" : "latin"}`.trim();
-          token.textContent = useHanFont ? piece.han : piece.name;
+          if (pieceStyleMode === "western") {
+            token.className = `piece-token ${piece.color} western`;
+            const wInfo = PIECE_SYMBOLS_WESTERN[piece.symbol] || { icon: piece.symbol, label: piece.symbol };
+            token.innerHTML = `<span class="piece-icon">${wInfo.icon}</span><span class="piece-sub-badge">${wInfo.label}</span>`;
+          } else if (pieceStyleMode === "viet") {
+            token.className = `piece-token ${piece.color} latin`;
+            token.textContent = piece.name;
+          } else {
+            token.className = `piece-token ${piece.color}`;
+            token.textContent = piece.han;
+          }
           btn.appendChild(token);
 
           if (piece.type === "K" && state?.isCheck && state.turn === piece.color) {
@@ -2251,7 +2879,13 @@
       for (const p of pieces) {
         const chip = document.createElement("span");
         chip.className = `captured-chip ${color}`;
-        chip.textContent = useHanFont ? PIECE_CHARS_HAN[p] : PIECE_NAMES_VI[p][0];
+        if (pieceStyleMode === "western") {
+          chip.textContent = PIECE_SYMBOLS_WESTERN[p]?.icon || p;
+        } else if (pieceStyleMode === "viet") {
+          chip.textContent = PIECE_NAMES_VI[p][0];
+        } else {
+          chip.textContent = PIECE_CHARS_HAN[p];
+        }
         chip.title = PIECE_NAMES_VI[p];
         container.appendChild(chip);
       }

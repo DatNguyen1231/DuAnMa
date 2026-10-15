@@ -181,6 +181,22 @@ class Board:
     def push(self, move: Move) -> None:
         self.push_uci(move.uci)
 
+    def pop(self) -> str | None:
+        if not self.history_uci:
+            return None
+        last_uci = self.history_uci.pop()
+        if HAS_PYFFISH:
+            self._fen = pyffish.start_fen("xiangqi")
+        else:
+            self._fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1"
+        self.fen_history = [self._fen.split()[0]]
+        self._is_check = False
+        remaining = list(self.history_uci)
+        self.history_uci = []
+        for uci in remaining:
+            self.push_uci(uci)
+        return last_uci
+
     def is_check(self) -> bool:
         return self._is_check
 

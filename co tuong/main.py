@@ -79,6 +79,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 await join_room(websocket, str(message.get("room", "")).strip())
             elif message_type == "move":
                 await make_move(websocket, message)
+            elif message_type == "undo":
+                await undo_move(websocket, int(message.get("steps", 1)))
             elif message_type == "restart":
                 await restart_room(websocket)
             else:
@@ -223,6 +225,34 @@ async def restart_room(websocket: WebSocket):
     room.move_history = []
     room.status = "playing" if has_two_players(room) else "waiting"
 
+    await broadcast_state(room)
+
+
+async def undo_move(websocket: WebSocket, steps: int = 1):
+    room, mark = get_connection_room(websocket)
+    if room is None:
+        await send_error(websocket, "Bạn chưa vào phòng.")
+        return
+
+    if mark == "viewer":
+        await send_error(websocket, "Khán giả không thể đi lại nước cờ.")
+        return
+
+    if not room.is_solo:
+        await send_error(websocket, "Chỉ có thể đi lại cờ trong chế độ luyện tập / đấu với máy.")
+        return
+
+    if not room.move_history:
+        await send_error(websocket, "Không có nước cờ nào để đi lại.")
+        return
+
+    steps = max(1, min(steps, len(room.move_history)))
+    for _ in range(steps):
+        if room.move_history:
+            room.move_history.pop()
+            room.board.pop()
+
+    room.status = "playing"
     await broadcast_state(room)
 
 
