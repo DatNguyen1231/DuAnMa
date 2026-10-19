@@ -1343,6 +1343,569 @@
       border-color: #334155;
       color: #f1f5f9;
     }
+
+    /* Quick Match & Matchmaking Button */
+    button.btn-quick-match {
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #e11d48 0%, #b91c1c 50%, #991b1b 100%);
+      color: white;
+      font-size: 14.5px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    button.btn-quick-match:hover:not(:disabled) {
+      background: linear-gradient(135deg, #f43f5e 0%, #dc2626 50%, #b91c1c 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(225, 29, 72, 0.45);
+    }
+
+    button.btn-leave-room,
+    button.btn-leave {
+      min-height: 38px;
+      border: 1.5px solid #f87171;
+      border-radius: 8px;
+      background: #fef2f2;
+      color: #b91c1c;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    button.btn-leave-room:hover,
+    button.btn-leave:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+    }
+
+    body.dark-theme button.btn-leave-room,
+    body.dark-theme button.btn-leave {
+      background: #271418;
+      border-color: #991b1b;
+      color: #fca5a5;
+    }
+
+    body.dark-theme button.btn-leave-room:hover,
+    body.dark-theme button.btn-leave:hover {
+      background: #3b171f;
+      border-color: #ef4444;
+    }
+
+    .game-action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button.btn-danger,
+    .btn-tool.danger {
+      min-height: 38px;
+      border: 1.5px solid #fca5a5;
+      border-radius: 8px;
+      background: #fff1f2;
+      color: #dc2626;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    button.btn-danger:hover,
+    .btn-tool.danger:hover {
+      background: #ffe4e6;
+      border-color: #ef4444;
+    }
+
+    body.dark-theme button.btn-danger,
+    body.dark-theme .btn-tool.danger {
+      background: #271418;
+      color: #f87171;
+      border-color: #7f1d1d;
+    }
+
+    body.dark-theme button.btn-danger:hover,
+    body.dark-theme .btn-tool.danger:hover {
+      background: #3b171f;
+      border-color: #ef4444;
+    }
+
+    /* Lobby Panel & Room Cards */
+    .lobby-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .lobby-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    body.dark-theme .lobby-title {
+      color: #f8fafc;
+    }
+
+    .room-count-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    .btn-refresh {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.15s;
+    }
+
+    .btn-refresh:hover {
+      background: #f1f5f9;
+      transform: rotate(45deg);
+    }
+
+    body.dark-theme .btn-refresh {
+      border-color: #475569;
+      color: #f1f5f9;
+    }
+
+    body.dark-theme .btn-refresh:hover {
+      background: #334155;
+    }
+
+    .room-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 340px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .room-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .room-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .room-card.waiting {
+      border-left: 4px solid #10b981;
+    }
+
+    .room-card.playing {
+      border-left: 4px solid #3b82f6;
+    }
+
+    body.dark-theme .room-card {
+      background: #131c2e;
+      border-color: #334155;
+    }
+
+    body.dark-theme .room-card.waiting {
+      border-left: 4px solid #10b981;
+    }
+
+    body.dark-theme .room-card.playing {
+      border-left: 4px solid #3b82f6;
+    }
+
+    .room-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .room-code,
+    .room-card-code {
+      font-family: 'Cinzel', monospace;
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    body.dark-theme .room-code,
+    body.dark-theme .room-card-code {
+      color: #f8fafc;
+    }
+
+    .room-badge,
+    .room-status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .badge-waiting,
+    .room-status-badge.waiting {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge-playing,
+    .room-status-badge.playing {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    .room-status-badge.finished {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+
+    body.dark-theme .badge-waiting,
+    body.dark-theme .room-status-badge.waiting {
+      background: #064e3b;
+      color: #6ee7b7;
+      border-color: #047857;
+    }
+
+    body.dark-theme .badge-playing,
+    body.dark-theme .room-status-badge.playing {
+      background: #1e3a8a;
+      color: #93c5fd;
+      border-color: #1d4ed8;
+    }
+
+    body.dark-theme .room-status-badge.finished {
+      background: #1e293b;
+      color: #94a3b8;
+      border-color: #334155;
+    }
+
+    .room-card-meta,
+    .room-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .room-card-players {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+    }
+
+    .btn-join-card,
+    .btn-join-room-card {
+      width: 100%;
+      min-height: 32px;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-join-card:hover,
+    .btn-join-room-card:hover {
+      background: #059669;
+    }
+
+    .btn-spectate-card,
+    .btn-spectate-room-card {
+      width: 100%;
+      min-height: 32px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-spectate-card:hover,
+    .btn-spectate-room-card:hover {
+      background: #e2e8f0;
+    }
+
+    body.dark-theme .btn-spectate-card,
+    body.dark-theme .btn-spectate-room-card {
+      background: #1e293b;
+      border-color: #475569;
+      color: #f1f5f9;
+    }
+
+    body.dark-theme .btn-spectate-card:hover,
+    body.dark-theme .btn-spectate-room-card:hover {
+      background: #334155;
+    }
+
+    .empty-room-notice,
+    .room-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+      padding: 20px 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* Matchmaking Radar Modal */
+    .matchmaking-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 30px 24px;
+    }
+
+    .matchmaking-radar {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 8px;
+    }
+
+    .radar-pulse {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid #e11d48;
+      animation: radarPulse 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+    }
+
+    .radar-pulse.delay {
+      animation-delay: 1s;
+    }
+
+    .radar-piece {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #fff7eb 0%, #ecd0a6 60%, #c59858 100%);
+      border: 2px solid var(--board-border);
+      box-shadow: 0 4px 12px rgba(90, 46, 18, 0.4);
+      display: grid;
+      place-items: center;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--primary);
+      z-index: 2;
+    }
+
+    @keyframes radarPulse {
+      0% { transform: scale(0.6); opacity: 1; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .matchmaking-timer {
+      font-family: 'Cinzel', monospace;
+      font-size: 26px;
+      font-weight: 900;
+      color: #e11d48;
+      letter-spacing: 2px;
+    }
+
+    .matchmaking-room-info {
+      font-size: 13px;
+      background: #f1f5f9;
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: #475569;
+    }
+
+    body.dark-theme .matchmaking-room-info {
+      background: #0f172a;
+      color: #cbd5e1;
+    }
+
+    .btn-cancel-match {
+      min-height: 38px;
+      padding: 0 20px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #475569;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-cancel-match:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    body.dark-theme .btn-cancel-match {
+      background: #1e293b;
+      border-color: #475569;
+      color: #f1f5f9;
+    }
+
+    body.dark-theme .btn-cancel-match:hover {
+      background: #334155;
+    }
+
+    /* Interaction Bar & Quick Chat / Emojis */
+    .interaction-bar {
+      width: min(610px, 96vw);
+      max-width: 610px;
+      margin-top: 10px;
+      background: var(--bg-card);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    body.dark-theme .interaction-bar {
+      background: rgba(19, 26, 42, 0.94);
+      border-color: #334155;
+    }
+
+    .emoji-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .btn-emoji {
+      background: transparent;
+      border: none;
+      font-size: 21px;
+      cursor: pointer;
+      padding: 3px 6px;
+      border-radius: 8px;
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .btn-emoji:hover {
+      transform: scale(1.25);
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    body.dark-theme .btn-emoji:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .quick-chat-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .quick-chat-select {
+      flex: 1;
+      height: 32px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 0 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      background: #ffffff;
+      color: #0f172a;
+      outline: none;
+    }
+
+    body.dark-theme .quick-chat-select {
+      background: #0f172a;
+      border-color: #334155;
+      color: #f1f5f9;
+    }
+
+    .btn-send-chat {
+      height: 32px;
+      padding: 0 14px;
+      border: none;
+      border-radius: 6px;
+      background: #1e293b;
+      color: white;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-send-chat:hover {
+      background: #0f172a;
+    }
+
+    body.dark-theme .btn-send-chat {
+      background: #3b82f6;
+    }
+
+    body.dark-theme .btn-send-chat:hover {
+      background: #2563eb;
+    }
+
+    .reaction-bubble {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(15, 23, 42, 0.92);
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      z-index: 50;
+      pointer-events: none;
+      animation: floatUpFade 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+    }
+
+    @keyframes floatUpFade {
+      0% { opacity: 0; transform: translate(-50%, 20px) scale(0.7); }
+      20% { opacity: 1; transform: translate(-50%, 0) scale(1.15); }
+      80% { opacity: 1; transform: translate(-50%, -10px) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -40px) scale(0.9); }
+    }
   </style>
 </head>
 <body>
@@ -1382,14 +1945,27 @@
         <section class="panel">
           <h2>Phòng đấu</h2>
           <div class="controls">
-            <button id="btnCreate" class="btn-primary">Tạo phòng Online (2 người)</button>
-            <button id="btnSolo" class="btn-solo">Luyện tập & Đấu với Bot</button>
-            <input id="roomInput" type="text" inputmode="numeric" maxlength="6" placeholder="Nhập mã phòng 6 số">
-            <button id="btnJoin" class="btn-secondary">Vào phòng</button>
+            <button id="btnQuickMatch" class="btn-quick-match" title="Tìm đối thủ ngẫu nhiên hoặc tự tạo phòng chờ">⚡ Ghép Đôi Nhanh (Tìm phòng)</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button id="btnCreate" class="btn-primary" style="font-size: 13px;">➕ Tạo phòng</button>
+              <button id="btnSolo" class="btn-solo" style="font-size: 13px;">🤖 Đấu Bot</button>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <input id="roomInput" type="text" inputmode="numeric" maxlength="6" placeholder="Nhập mã 6 số" style="flex: 1;">
+              <button id="btnJoin" class="btn-secondary" style="width: auto; padding: 0 16px;">Vào</button>
+            </div>
+
+            <div id="gameActionButtons" class="game-action-buttons" style="display: none;">
+              <button id="btnDrawOffer" class="btn-secondary" title="Đề nghị hòa với đối thủ">🤝 Xin hòa</button>
+              <button id="btnResign" class="btn-danger" title="Nhận thua cuộc ván này">🏳️ Đầu hàng</button>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
               <button id="btnUndo" class="btn-restart" disabled title="Đi lại nước cờ (Undo)">↩️ Đi lại cờ</button>
               <button id="btnRestart" class="btn-restart" disabled>Chơi ván mới</button>
             </div>
+
+            <button id="btnLeaveRoom" class="btn-leave" style="display: none;" title="Rời khỏi phòng để trở về Sảnh chờ">🚪 Rời phòng / Về sảnh</button>
           </div>
 
           <!-- Panel Cấu hình Bot & Luyện tập -->
@@ -1490,6 +2066,23 @@
 
           <div id="messageBox" class="message">
             Kết nối máy chủ để bắt đầu trận đấu.
+          </div>
+        </section>
+
+        <!-- Lobby / Public Room Browser Panel -->
+        <section class="panel" id="lobbyPanel">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+            <h2 style="margin: 0; font-size: 15px; display: flex; align-items: center; gap: 6px;">
+              🏛️ Sảnh chờ trực tuyến
+              <span id="roomCountBadge" class="room-count-badge">0</span>
+            </h2>
+            <button id="btnRefreshRooms" class="btn-tool" title="Làm mới danh sách phòng" style="padding: 4px 10px; font-size: 13px; font-weight: 700;">🔄 Làm mới</button>
+          </div>
+          <div id="roomListContainer" class="room-list-container">
+            <div class="room-empty-state">
+              <span style="font-size: 26px;">📭</span>
+              <span>Chưa có phòng công khai nào.<br>Bấm <b>Ghép Đôi Nhanh</b> hoặc <b>Tạo phòng</b>!</span>
+            </div>
           </div>
         </section>
       </aside>
@@ -1660,6 +2253,36 @@
               <div id="boardIntersections" class="board-intersections"></div>
             </div>
           </div>
+          <!-- Floating Reaction & Emoji Bubble Overlay -->
+          <div id="reactionOverlay" style="position: absolute; inset: 0; pointer-events: none; z-index: 60; overflow: hidden;"></div>
+        </div>
+
+        <!-- In-game Interaction Bar (Quick Chat & Emojis) -->
+        <div id="interactionBar" class="interaction-bar" style="display: none;">
+          <div class="emoji-bar">
+            <button type="button" class="btn-emoji" data-emoji="👏" title="Vỗ tay">👏</button>
+            <button type="button" class="btn-emoji" data-emoji="🔥" title="Căng thẳng / Hay quá">🔥</button>
+            <button type="button" class="btn-emoji" data-emoji="🤔" title="Đang suy nghĩ">🤔</button>
+            <button type="button" class="btn-emoji" data-emoji="😅" title="Sơ suất rồi">😅</button>
+            <button type="button" class="btn-emoji" data-emoji="👑" title="Tuyệt vời">👑</button>
+            <button type="button" class="btn-emoji" data-emoji="☕" title="Thong thả nào">☕</button>
+            <button type="button" class="btn-emoji" data-emoji="🤝" title="Giao lưu vui vẻ">🤝</button>
+            <button type="button" class="btn-emoji" data-emoji="🎯" title="Nước đi đỉnh cao">🎯</button>
+          </div>
+          <div class="quick-chat-row">
+            <select id="quickChatSelect" class="quick-chat-select">
+              <option value="" disabled selected>-- Chọn câu chat nhanh --</option>
+              <option value="Chào bạn, chúc một ván cờ hay!">👋 Chào bạn, chúc một ván cờ hay!</option>
+              <option value="Nước cờ cao quá!">👏 Nước cờ cao quá!</option>
+              <option value="Căng thẳng quá!">🔥 Căng thẳng quá!</option>
+              <option value="Tôi lỡ tay bấm nhầm rồi!">😅 Tôi lỡ tay bấm nhầm rồi!</option>
+              <option value="Xin mời bạn đi tiếp.">⏱️ Xin mời bạn đi tiếp.</option>
+              <option value="Ván cờ hấp dẫn thật!">🏆 Ván cờ hấp dẫn thật!</option>
+              <option value="Cảm ơn bạn đã chỉ giáo!">🤝 Cảm ơn bạn đã chỉ giáo!</option>
+              <option value="Làm ván nữa nhé?">🔄 Làm ván nữa nhé?</option>
+            </select>
+            <button id="btnSendChat" type="button" class="btn-send-chat">Gửi 💬</button>
+          </div>
         </div>
       </section>
 
@@ -1752,6 +2375,38 @@
     </div>
   </div>
 
+  <!-- Matchmaking Radar Modal -->
+  <div id="matchmakingModal" class="modal-backdrop">
+    <div class="modal-card matchmaking-card">
+      <div class="matchmaking-radar">
+        <div class="radar-pulse"></div>
+        <div class="radar-pulse delay"></div>
+        <div class="radar-piece">帥</div>
+      </div>
+      <h2 style="margin: 0; font-size: 20px;">Đang tìm đối thủ...</h2>
+      <div id="matchmakingTimer" class="matchmaking-timer">00:00</div>
+      <div id="matchmakingInfo" class="matchmaking-room-info">
+        Đang quét phòng chờ có sẵn hoặc tạo bàn mới...
+      </div>
+      <button id="btnCancelMatch" class="btn-cancel-match">Hủy tìm kiếm</button>
+    </div>
+  </div>
+
+  <!-- Draw Offer Modal -->
+  <div id="drawModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-icon">🤝</div>
+      <h2 style="margin-top: 6px;">Lời mời hòa cờ</h2>
+      <p id="drawModalText" style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+        Đối thủ đang gửi lời đề nghị hòa ván cờ này. Bạn có đồng ý không?
+      </p>
+      <div class="modal-actions">
+        <button id="btnAcceptDraw" class="btn-primary">Đồng ý hòa</button>
+        <button id="btnDeclineDraw" class="btn-restart">Từ chối</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast">Đã sao chép mã phòng!</div>
 
   <script src="/wukong.js"></script>
@@ -1799,6 +2454,11 @@
       stalemate: "Bức tử (Hết nước đi)",
       repetition: "Hòa do lặp lại thế cờ 3 lần",
       insufficient_material: "Hòa do không đủ lực lượng chiếu hết",
+      resignation: "Đối thủ đã đầu hàng",
+      resign_red: "Bên Đỏ đã đầu hàng",
+      resign_black: "Bên Đen đã đầu hàng",
+      draw_agreed: "Hòa theo thỏa thuận 2 bên",
+      opponent_left: "Đối thủ đã rời khỏi phòng",
       finished: "Ván cờ kết thúc",
     };
 
@@ -1851,6 +2511,29 @@
     const coordBottom = document.getElementById("coordBottom");
     const toast = document.getElementById("toast");
 
+    // Lobby, Matchmaking & Interaction DOM Elements
+    const btnQuickMatch = document.getElementById("btnQuickMatch");
+    const btnLeaveRoom = document.getElementById("btnLeaveRoom");
+    const gameActionButtons = document.getElementById("gameActionButtons");
+    const btnDrawOffer = document.getElementById("btnDrawOffer");
+    const btnResign = document.getElementById("btnResign");
+    const lobbyPanel = document.getElementById("lobbyPanel");
+    const roomCountBadge = document.getElementById("roomCountBadge");
+    const btnRefreshRooms = document.getElementById("btnRefreshRooms");
+    const roomListContainer = document.getElementById("roomListContainer");
+    const matchmakingModal = document.getElementById("matchmakingModal");
+    const matchmakingTimer = document.getElementById("matchmakingTimer");
+    const matchmakingInfo = document.getElementById("matchmakingInfo");
+    const btnCancelMatch = document.getElementById("btnCancelMatch");
+    const drawModal = document.getElementById("drawModal");
+    const drawModalText = document.getElementById("drawModalText");
+    const btnAcceptDraw = document.getElementById("btnAcceptDraw");
+    const btnDeclineDraw = document.getElementById("btnDeclineDraw");
+    const reactionOverlay = document.getElementById("reactionOverlay");
+    const interactionBar = document.getElementById("interactionBar");
+    const quickChatSelect = document.getElementById("quickChatSelect");
+    const btnSendChat = document.getElementById("btnSendChat");
+
     // Undo DOM Elements
     const btnUndo = document.getElementById("btnUndo");
     const btnBotUndo = document.getElementById("btnBotUndo");
@@ -1885,6 +2568,12 @@
     let themeMode = localStorage.getItem("xiangqi_theme") || "light"; // "light" | "dark"
     let soundEnabled = true;
     let shownResultFen = null;
+
+    // Matchmaking & Lobby state
+    let isMatchmaking = false;
+    let matchStartTime = 0;
+    let matchTimerInterval = null;
+    let publicRooms = [];
 
     // Bot AI state (Wukong Xiangqi Library)
     let wukongEngine = null;
@@ -1957,6 +2646,27 @@
     connect();
 
     // Event Listeners
+    if (btnQuickMatch) btnQuickMatch.addEventListener("click", startMatchmaking);
+    if (btnCancelMatch) btnCancelMatch.addEventListener("click", cancelMatchmaking);
+    if (btnLeaveRoom) btnLeaveRoom.addEventListener("click", leaveCurrentRoom);
+    if (btnDrawOffer) btnDrawOffer.addEventListener("click", offerDraw);
+    if (btnResign) btnResign.addEventListener("click", resignMatch);
+    if (btnAcceptDraw) btnAcceptDraw.addEventListener("click", () => respondDraw(true));
+    if (btnDeclineDraw) btnDeclineDraw.addEventListener("click", () => respondDraw(false));
+    if (btnRefreshRooms) btnRefreshRooms.addEventListener("click", () => {
+      send({ type: "get_rooms" });
+      showToast("Đang làm mới sảnh chờ...");
+    });
+    if (btnSendChat) btnSendChat.addEventListener("click", sendQuickChat);
+    if (quickChatSelect) {
+      quickChatSelect.addEventListener("change", () => {
+        if (quickChatSelect.value) sendQuickChat();
+      });
+    }
+    document.querySelectorAll(".btn-emoji").forEach((btn) => {
+      btn.addEventListener("click", () => sendReaction(btn.dataset.emoji));
+    });
+
     btnCreate.addEventListener("click", () => send({ type: "create_room" }));
     btnSolo.addEventListener("click", () => send({ type: "create_solo_room" }));
     btnJoin.addEventListener("click", joinRoom);
@@ -2175,8 +2885,9 @@
       socket.addEventListener("open", () => {
         connectionStatus.textContent = "Đã kết nối";
         statusDot.className = "status-dot connected";
-        messageBox.textContent = "Tạo phòng mới hoặc nhập mã phòng để bắt đầu.";
+        messageBox.textContent = "Tạo phòng mới hoặc chọn phòng từ sảnh chờ để bắt đầu.";
         updateTurnBanner("Sẵn sàng", "Tạo phòng online hoặc bấm Luyện tập để chơi.", "");
+        send({ type: "get_rooms" });
       });
 
       socket.addEventListener("message", (event) => {
@@ -2194,13 +2905,28 @@
           botTimer = null;
         }
         updateBotThinkingUI(false);
+        if (isMatchmaking) cancelMatchmaking();
         setRoomControls(false);
       });
     }
 
     function handleMessage(data) {
+      if (data.type === "room_list") {
+        renderRoomList(data.rooms);
+        return;
+      }
+
       if (data.type === "room_created" || data.type === "joined") {
         myMark = data.mark;
+
+        if (isMatchmaking) {
+          if (data.type === "joined" && data.matched) {
+            stopMatchmakingSuccess();
+          } else if (data.waiting_match) {
+            matchmakingInfo.textContent = `Đã tạo phòng #${data.room}. Đang chờ đối thủ ghép vào...`;
+          }
+        }
+
         if (data.mark === "both") {
           messageBox.textContent = "Chế độ Luyện tập đã sẵn sàng. Bot AI sẽ tự động tính nước cờ theo cài đặt của bạn!";
           botControlPanel.classList.add("active");
@@ -2221,6 +2947,10 @@
       }
 
       if (data.type === "state") {
+        if (isMatchmaking && data.status === "playing") {
+          stopMatchmakingSuccess();
+        }
+
         const prevFen = state?.fen;
         state = data;
         myMark = data.mark || myMark;
@@ -2241,9 +2971,45 @@
         return;
       }
 
+      if (data.type === "left_room") {
+        if (isMatchmaking) cancelMatchmaking();
+        state = null;
+        myMark = null;
+        selectedSquare = null;
+        shownResultFen = null;
+        resultModal.classList.remove("open");
+        drawModal.classList.remove("open");
+        setRoomControls(false);
+        renderEmptyBoard();
+        updateTurnBanner("Sẵn sàng", "Tạo phòng online hoặc bấm Luyện tập để chơi.", "");
+        messageBox.textContent = "Bạn đã trở về Sảnh chờ trực tuyến.";
+        showToast("Đã rời phòng và quay về Sảnh chờ.");
+        send({ type: "get_rooms" });
+        return;
+      }
+
+      if (data.type === "draw_offered") {
+        const proposer = data.by || data.from;
+        drawModalText.textContent = `Người chơi ${colorLabel(proposer)} vừa gửi lời đề nghị hòa ván cờ này. Bạn có đồng ý không?`;
+        drawModal.classList.add("open");
+        playSound("check");
+        return;
+      }
+
+      if (data.type === "draw_declined") {
+        showToast("Đối thủ đã từ chối lời đề nghị hòa cờ!");
+        return;
+      }
+
+      if (data.type === "chat_message") {
+        showReactionBubble(data.from, data.text, data.emoji);
+        return;
+      }
+
       if (data.type === "error") {
         messageBox.textContent = data.message;
         showToast(data.message);
+        if (isMatchmaking) cancelMatchmaking();
         return;
       }
 
@@ -2992,10 +3758,232 @@
       btnSolo.disabled = inRoom;
       btnJoin.disabled = inRoom;
       roomInput.disabled = inRoom;
+      if (btnQuickMatch) btnQuickMatch.disabled = inRoom;
+      if (btnLeaveRoom) btnLeaveRoom.style.display = inRoom ? "block" : "none";
+
+      const isSolo = (myMark === "both");
+      const isPlayer = (myMark === "red" || myMark === "black");
+
+      if (gameActionButtons) {
+        gameActionButtons.style.display = (inRoom && isPlayer && !isSolo) ? "grid" : "none";
+      }
+
+      if (interactionBar) {
+        interactionBar.style.display = (inRoom && !isSolo) ? "flex" : "none";
+      }
+
+      if (btnUndo) {
+        btnUndo.disabled = !inRoom || !isSolo;
+      }
+
+      if (btnRestart) {
+        btnRestart.disabled = !inRoom;
+      }
+
       if (!inRoom) {
         botControlPanel.classList.remove("active");
-        btnRestart.disabled = true;
+        roomCode.textContent = "-";
+        playerMark.textContent = "-";
+        turnMark.textContent = "-";
+        moveNumber.textContent = "-";
+        playersStatus.textContent = "0/2";
+        redMeta.textContent = "Đang chờ người chơi...";
+        blackMeta.textContent = "Đang chờ người chơi...";
+        redBadge.className = "badge waiting";
+        redBadge.textContent = "Chờ";
+        blackBadge.className = "badge waiting";
+        blackBadge.textContent = "Chờ";
+        redCapturedList.innerHTML = '<span style="color: #94a3b8; font-size: 12px;">Chưa có</span>';
+        blackCapturedList.innerHTML = '<span style="color: #94a3b8; font-size: 12px;">Chưa có</span>';
+        moveHistoryBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 14px;">Chưa có nước đi</td></tr>';
       }
+    }
+
+    // Lobby Room Browser Functions
+    function renderRoomList(rooms) {
+      publicRooms = rooms || [];
+      if (roomCountBadge) {
+        roomCountBadge.textContent = `${publicRooms.length}`;
+      }
+      if (!roomListContainer) return;
+
+      if (publicRooms.length === 0) {
+        roomListContainer.innerHTML = `
+          <div class="room-empty-state">
+            <span style="font-size: 26px;">📭</span>
+            <span>Chưa có phòng công khai nào.<br>Bấm <b>Ghép Đôi Nhanh</b> hoặc <b>Tạo phòng</b> để mở bàn!</span>
+          </div>
+        `;
+        return;
+      }
+
+      roomListContainer.innerHTML = publicRooms.map(r => {
+        const isWaiting = r.status === "waiting";
+        const isPlaying = r.status === "playing";
+        const badgeClass = isWaiting ? "waiting" : isPlaying ? "playing" : "finished";
+        const badgeText = isWaiting ? "🟡 Đang chờ đối thủ" : isPlaying ? `🟢 Đang đấu (${r.moves} nước)` : "🏁 Đã kết thúc";
+
+        const btnHtml = isWaiting && (!r.has_red || !r.has_black)
+          ? `<button class="btn-join-room-card" onclick="joinRoomByCode('${r.code}')">Vào chơi ⚔️</button>`
+          : `<button class="btn-spectate-room-card" onclick="joinRoomByCode('${r.code}')">Xem cờ 👁️</button>`;
+
+        const slotRed = r.has_red ? '<span style="color: var(--primary); font-weight: 700;">Đỏ: Có</span>' : '<span style="color: #94a3b8;">Đỏ: Trống</span>';
+        const slotBlack = r.has_black ? '<span style="color: #0f172a; font-weight: 700;">Đen: Có</span>' : '<span style="color: #94a3b8;">Đen: Trống</span>';
+        const viewersText = r.viewers > 0 ? ` · 👁️ ${r.viewers}` : '';
+
+        return `
+          <div class="room-card ${isWaiting ? 'waiting' : ''}">
+            <div class="room-card-header">
+              <span class="room-card-code">#${r.code}</span>
+              <span class="room-status-badge ${badgeClass}">${badgeText}</span>
+            </div>
+            <div class="room-card-body">
+              <div class="room-card-players">
+                ${slotRed} · ${slotBlack}${viewersText}
+              </div>
+              ${btnHtml}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function joinRoomByCode(code) {
+      if (!code) return;
+      if (state && state.room && state.status === "playing" && (myMark === "red" || myMark === "black")) {
+        if (!confirm("Bạn đang trong một ván đấu. Bạn có chắc chắn muốn rời trận hiện tại để vào phòng này không?")) {
+          return;
+        }
+      }
+      send({ type: "join_room", room: code });
+    }
+    window.joinRoomByCode = joinRoomByCode;
+
+    // Matchmaking Controller
+    function startMatchmaking() {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        showToast("Chưa kết nối máy chủ!");
+        return;
+      }
+      isMatchmaking = true;
+      matchStartTime = Date.now();
+      matchmakingModal.classList.add("open");
+      matchmakingTimer.textContent = "00:00";
+      matchmakingInfo.textContent = "Đang tìm phòng chờ có sẵn hoặc tự tạo bàn mới...";
+
+      if (matchTimerInterval) clearInterval(matchTimerInterval);
+      matchTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - matchStartTime) / 1000);
+        const mins = String(Math.floor(elapsed / 60)).padStart(2, "0");
+        const secs = String(elapsed % 60).padStart(2, "0");
+        matchmakingTimer.textContent = `${mins}:${secs}`;
+      }, 1000);
+
+      send({ type: "quick_match" });
+    }
+
+    function cancelMatchmaking() {
+      if (!isMatchmaking) return;
+      isMatchmaking = false;
+      if (matchTimerInterval) {
+        clearInterval(matchTimerInterval);
+        matchTimerInterval = null;
+      }
+      matchmakingModal.classList.remove("open");
+      if (state && state.status === "waiting") {
+        send({ type: "leave_room" });
+      }
+      showToast("Đã hủy ghép đôi.");
+    }
+
+    function stopMatchmakingSuccess() {
+      if (!isMatchmaking) return;
+      isMatchmaking = false;
+      if (matchTimerInterval) {
+        clearInterval(matchTimerInterval);
+        matchTimerInterval = null;
+      }
+      matchmakingModal.classList.remove("open");
+      showToast("Ghép đôi thành công! Trận đấu bắt đầu.");
+    }
+
+    // Room Leaving
+    function leaveCurrentRoom() {
+      if (!state || !state.room) return;
+      if (state.status === "playing" && (myMark === "red" || myMark === "black")) {
+        if (!confirm("Ván cờ đang diễn ra! Rời phòng bây giờ sẽ bị xử thua cuộc. Bạn có chắc chắn muốn rời phòng về sảnh không?")) {
+          return;
+        }
+      }
+      send({ type: "leave_room" });
+    }
+
+    // In-game Match Actions: Resign & Draw
+    function resignMatch() {
+      if (!state || state.status !== "playing" || (myMark !== "red" && myMark !== "black")) {
+        showToast("Chỉ có kỳ thủ đang chơi mới có thể đầu hàng!");
+        return;
+      }
+      if (confirm("Bạn có chắc chắn muốn nhận thua cuộc (đầu hàng) ván này không?")) {
+        send({ type: "resign" });
+      }
+    }
+
+    function offerDraw() {
+      if (!state || state.status !== "playing" || (myMark !== "red" && myMark !== "black")) {
+        showToast("Chỉ có thể xin hòa khi đang trong ván đấu!");
+        return;
+      }
+      send({ type: "draw_offer" });
+      showToast("Đã gửi đề nghị hòa tới đối thủ...");
+    }
+
+    function respondDraw(accept) {
+      drawModal.classList.remove("open");
+      send({ type: "draw_response", accept });
+      if (!accept) {
+        showToast("Đã từ chối lời đề nghị hòa.");
+      }
+    }
+
+    // Quick Chat & Floating Reaction Bubbles
+    function sendReaction(emoji) {
+      if (!emoji || !state || !state.room) {
+        showToast("Hãy vào một phòng để gửi biểu cảm!");
+        return;
+      }
+      send({ type: "chat", emoji, text: "" });
+    }
+
+    function sendQuickChat() {
+      if (!state || !state.room) {
+        showToast("Hãy vào một phòng để gửi tin nhắn!");
+        return;
+      }
+      const text = quickChatSelect.value;
+      if (!text) {
+        showToast("Hãy chọn một câu chat mẫu!");
+        return;
+      }
+      send({ type: "chat", emoji: "", text });
+      quickChatSelect.selectedIndex = 0;
+    }
+
+    function showReactionBubble(fromMark, text, emoji) {
+      if (!reactionOverlay) return;
+      const bubble = document.createElement("div");
+      bubble.className = "reaction-bubble";
+
+      const senderLabel = fromMark === myMark ? "Bạn" : (COLOR_LABELS[fromMark] || "Đối thủ");
+      const icon = emoji || "💬";
+      const content = emoji ? `${emoji}` : `${text}`;
+
+      bubble.innerHTML = `<span style="font-size: 22px;">${icon}</span> <span><b>${senderLabel}:</b> ${content}</span>`;
+      reactionOverlay.appendChild(bubble);
+
+      setTimeout(() => {
+        if (bubble.parentElement) bubble.parentElement.removeChild(bubble);
+      }, 2600);
     }
 
     function colorLabel(color) {

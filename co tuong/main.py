@@ -40,10 +40,52 @@ class Room:
     status: GameStatus = "waiting"
     move_history: list[dict[str, str]] = field(default_factory=list)
     is_solo: bool = False
+    winner: str | None = None
+    result_reason: str | None = None
 
 
 rooms: dict[str, Room] = {}
 connections: dict[WebSocket, tuple[str, ConnectionRole]] = {}
+lobby_websockets: set[WebSocket] = set()
+
+
+def serialize_room_list() -> list[dict]:
+    res = []
+    for code, room in rooms.items():
+        if room.is_solo:
+            continue
+        has_red = room.players["red"] is not None
+        has_black = room.players["black"] is not None
+        player_count = int(has_red) + int(has_black)
+        viewer_count = len(room.viewers)
+        move_count = len(room.move_history)
+        res.append({
+            "code": code,
+            "status": room.status,
+            "has_red": has_red,
+            "has_black": has_black,
+            "playerCount": player_count,
+            "viewerCount": viewer_count,
+            "viewers": viewer_count,
+            "moveCount": move_count,
+            "moves": move_count,
+            "canJoin": room.status == "waiting" and player_count < 2,
+            "canSpectate": True,
+        })
+    res.sort(key=lambda r: (r["status"] != "waiting", -r["playerCount"], -r["viewerCount"]))
+    return res
+
+
+async def broadcast_room_list():
+    room_list_data = serialize_room_list()
+    msg = {"type": "room_list", "rooms": room_list_data}
+    dead = set()
+    for ws in list(lobby_websockets):
+        try:
+            await ws.send_json(msg)
+        except Exception:
+            dead.add(ws)
+    lobby_websockets.difference_update(dead)
 
 
 @app.get("/")
@@ -51,9 +93,21 @@ def home():
     return {"message": "Máy chủ cờ tướng đang chạy", "rooms": len(rooms)}
 
 
+@app.get("/rooms")
+def get_rooms():
+    return {"rooms": serialize_room_list()}
+
+
 @app.get("/ui")
 def ui():
-    return FileResponse(BASE_DIR / "index.html")
+    return FileResponse(
+        BASE_DIR / "index.html",
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
 
 
 @app.get("/wukong.js")
@@ -65,6 +119,11 @@ def wukong_js():
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    lobby_websockets.add(websocket)
+    try:
+        await websocket.send_json({"type": "room_list", "rooms": serialize_room_list()})
+    except Exception:
+        pass
 
     try:
         while True:
@@ -75,14 +134,28 @@ async def websocket_endpoint(websocket: WebSocket):
                 await create_room(websocket)
             elif message_type == "create_solo_room":
                 await create_solo_room(websocket)
+            elif message_type == "quick_match":
+                await quick_match(websocket)
             elif message_type == "join_room":
                 await join_room(websocket, str(message.get("room", "")).strip())
+            elif message_type == "leave_room":
+                await leave_room(websocket)
+            elif message_type == "get_rooms":
+                await websocket.send_json({"type": "room_list", "rooms": serialize_room_list()})
             elif message_type == "move":
                 await make_move(websocket, message)
             elif message_type == "undo":
                 await undo_move(websocket, int(message.get("steps", 1)))
             elif message_type == "restart":
                 await restart_room(websocket)
+            elif message_type == "resign":
+                await resign_game(websocket)
+            elif message_type == "draw_offer":
+                await handle_draw_offer(websocket)
+            elif message_type == "draw_response":
+                await handle_draw_response(websocket, bool(message.get("accept", False)))
+            elif message_type == "chat":
+                await handle_chat(websocket, message)
             else:
                 await send_error(websocket, "Lệnh không hợp lệ.")
 
@@ -103,6 +176,7 @@ async def create_room(websocket: WebSocket):
 
     await websocket.send_json({"type": "room_created", "room": code, "mark": "red"})
     await broadcast_state(room)
+    await broadcast_room_list()
 
 
 async def create_solo_room(websocket: WebSocket):
@@ -120,6 +194,41 @@ async def create_solo_room(websocket: WebSocket):
 
     await websocket.send_json({"type": "room_created", "room": code, "mark": "both"})
     await broadcast_state(room)
+    await broadcast_room_list()
+
+
+async def quick_match(websocket: WebSocket):
+    if websocket in connections:
+        await leave_room(websocket)
+
+    available_room = None
+    for room in rooms.values():
+        if (
+            not room.is_solo
+            and room.status == "waiting"
+            and (room.players["red"] is None or room.players["black"] is None)
+        ):
+            available_room = room
+            break
+
+    if available_room is not None:
+        mark: PlayerColor = "black" if available_room.players["red"] is not None else "red"
+        available_room.players[mark] = websocket
+        available_room.status = "playing"
+        connections[websocket] = (available_room.code, mark)
+        await websocket.send_json({"type": "joined", "room": available_room.code, "mark": mark, "matched": True})
+        await broadcast_state(available_room)
+        await broadcast_room_list()
+    else:
+        code = create_room_code()
+        room = Room(code=code)
+        room.players["red"] = websocket
+        room.status = "waiting"
+        rooms[code] = room
+        connections[websocket] = (code, "red")
+        await websocket.send_json({"type": "room_created", "room": code, "mark": "red", "waiting_match": True})
+        await broadcast_state(room)
+        await broadcast_room_list()
 
 
 async def join_room(websocket: WebSocket, code: str):
@@ -137,6 +246,7 @@ async def join_room(websocket: WebSocket, code: str):
         connections[websocket] = (room.code, "viewer")
         await websocket.send_json({"type": "joined", "room": room.code, "mark": "viewer"})
         await broadcast_state(room)
+        await broadcast_room_list()
         return
 
     mark: PlayerColor = "black" if room.players["red"] is not None else "red"
@@ -146,6 +256,51 @@ async def join_room(websocket: WebSocket, code: str):
 
     await websocket.send_json({"type": "joined", "room": room.code, "mark": mark})
     await broadcast_state(room)
+    await broadcast_room_list()
+
+
+async def leave_room(websocket: WebSocket):
+    lobby_websockets.add(websocket)
+    connection = connections.pop(websocket, None)
+    if connection is None:
+        await websocket.send_json({"type": "left_room"})
+        await broadcast_room_list()
+        return
+
+    room_code, mark = connection
+    room = rooms.get(room_code)
+    if room is not None:
+        if mark == "both":
+            rooms.pop(room_code, None)
+        elif mark == "viewer":
+            if websocket in room.viewers:
+                room.viewers.remove(websocket)
+            await broadcast_state(room)
+        else:
+            room.players[mark] = None
+            if room.status == "playing":
+                room.status = "waiting"
+
+            if room.players["red"] is None and room.players["black"] is None:
+                rooms.pop(room_code, None)
+            else:
+                for player_socket in room.players.values():
+                    if player_socket is not None and player_socket != websocket:
+                        try:
+                            await player_socket.send_json({"type": "opponent_left", "mark": mark})
+                            await send_state(player_socket, room)
+                        except Exception:
+                            pass
+                for viewer_socket in room.viewers:
+                    try:
+                        await viewer_socket.send_json({"type": "opponent_left", "mark": mark})
+                        await send_state(viewer_socket, room)
+                    except Exception:
+                        pass
+                await broadcast_state(room)
+
+    await websocket.send_json({"type": "left_room"})
+    await broadcast_room_list()
 
 
 async def make_move(websocket: WebSocket, message: dict):
@@ -203,6 +358,7 @@ async def make_move(websocket: WebSocket, message: dict):
 
     if room.board.is_game_over():
         room.status = "finished"
+        await broadcast_room_list()
 
     await broadcast_state(room)
 
@@ -223,9 +379,12 @@ async def restart_room(websocket: WebSocket):
 
     room.board = xiangqi.Board()
     room.move_history = []
+    room.winner = None
+    room.result_reason = None
     room.status = "playing" if has_two_players(room) else "waiting"
 
     await broadcast_state(room)
+    await broadcast_room_list()
 
 
 async def undo_move(websocket: WebSocket, steps: int = 1):
@@ -253,27 +412,111 @@ async def undo_move(websocket: WebSocket, steps: int = 1):
             room.board.pop()
 
     room.status = "playing"
+    room.winner = None
+    room.result_reason = None
     await broadcast_state(room)
+    await broadcast_room_list()
+
+
+async def resign_game(websocket: WebSocket):
+    room, mark = get_connection_room(websocket)
+    if room is None or mark is None:
+        await send_error(websocket, "Bạn chưa vào phòng.")
+        return
+    if room.status != "playing":
+        await send_error(websocket, "Trận đấu chưa bắt đầu hoặc đã kết thúc.")
+        return
+    if mark not in {"red", "black"}:
+        await send_error(websocket, "Chỉ người chơi mới được đầu hàng.")
+        return
+
+    room.status = "finished"
+    room.winner = "black" if mark == "red" else "red"
+    room.result_reason = f"resign_{mark}"
+    await broadcast_state(room)
+    await broadcast_room_list()
+
+
+async def handle_draw_offer(websocket: WebSocket):
+    room, mark = get_connection_room(websocket)
+    if room is None or mark not in {"red", "black"} or room.status != "playing":
+        return
+    opponent_mark = "black" if mark == "red" else "red"
+    opponent_socket = room.players[opponent_mark]
+    if opponent_socket is not None:
+        try:
+            await opponent_socket.send_json({"type": "draw_offered", "by": mark, "from": mark})
+        except Exception:
+            pass
+
+
+async def handle_draw_response(websocket: WebSocket, accept: bool):
+    room, mark = get_connection_room(websocket)
+    if room is None or mark not in {"red", "black"} or room.status != "playing":
+        return
+    if accept:
+        room.status = "finished"
+        room.winner = None
+        room.result_reason = "draw_agreed"
+        await broadcast_state(room)
+        await broadcast_room_list()
+    else:
+        opponent_mark = "black" if mark == "red" else "red"
+        opponent_socket = room.players[opponent_mark]
+        if opponent_socket is not None:
+            try:
+                await opponent_socket.send_json({"type": "draw_declined"})
+            except Exception:
+                pass
+
+
+async def handle_chat(websocket: WebSocket, message: dict):
+    room, mark = get_connection_room(websocket)
+    if room is None:
+        return
+    text = str(message.get("text", "")).strip()[:150]
+    emoji = str(message.get("emoji", "")).strip()[:10]
+    if not text and not emoji:
+        return
+    payload = {
+        "type": "chat_message",
+        "from": mark,
+        "sender": mark,
+        "text": text,
+        "emoji": emoji,
+    }
+    targets = set(ws for ws in room.players.values() if ws is not None)
+    targets.update(room.viewers)
+    for ws in targets:
+        try:
+            await ws.send_json(payload)
+        except Exception:
+            pass
 
 
 async def disconnect(websocket: WebSocket):
+    lobby_websockets.discard(websocket)
     connection = connections.pop(websocket, None)
     if connection is None:
+        await broadcast_room_list()
         return
 
     room_code, mark = connection
     room = rooms.get(room_code)
     if room is None:
+        await broadcast_room_list()
         return
 
     if mark == "both":
         rooms.pop(room_code, None)
+        await broadcast_room_list()
         return
 
     if mark == "viewer":
         if websocket in room.viewers:
             room.viewers.remove(websocket)
         await broadcast_state(room)
+        await broadcast_room_list()
         return
 
     room.players[mark] = None
@@ -283,6 +526,7 @@ async def disconnect(websocket: WebSocket):
     # If both players left, clean up the room
     if room.players["red"] is None and room.players["black"] is None:
         rooms.pop(room_code, None)
+        await broadcast_room_list()
         return
 
     for player_socket in room.players.values():
@@ -300,6 +544,8 @@ async def disconnect(websocket: WebSocket):
                 await send_state(viewer_socket, room)
             except Exception:
                 pass
+
+    await broadcast_room_list()
 
 
 def create_room_code() -> str:
@@ -337,18 +583,19 @@ async def send_state(websocket: WebSocket, room: Room):
     is_check = room.board.is_check()
     is_rep = room.board.is_repetition()
     is_insufficient = room.board.is_insufficient_material()
-    winner = None
+    winner = room.winner
+    if winner is None:
+        if is_checkmate or is_stalemate or room.status == "finished":
+            winner = room.board.winner()
 
-    if is_checkmate or is_stalemate:
-        winner = room.board.winner()
-    elif room.status == "finished":
-        winner = room.board.winner()
+    result_reason = room.result_reason or room.board.result_reason()
 
     await websocket.send_json(
         {
             "type": "state",
             "room": room.code,
             "mark": mark,
+            "isSolo": room.is_solo,
             "boardCols": xiangqi.BOARD_COLS,
             "boardRows": xiangqi.BOARD_ROWS,
             "board": serialize_board(room.board),
@@ -360,7 +607,7 @@ async def send_state(websocket: WebSocket, room: Room):
             "isCheckmate": is_checkmate,
             "isStalemate": is_stalemate,
             "isDraw": is_rep or is_insufficient or (room.status == "finished" and winner is None),
-            "resultReason": room.board.result_reason(),
+            "resultReason": result_reason,
             "lastMove": room.move_history[-1] if room.move_history else None,
             "moveHistory": room.move_history,
             "fullmoveNumber": room.board.fullmove_number,

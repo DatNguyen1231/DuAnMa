@@ -115,7 +115,7 @@ if "%SKIP_LAUNCH%"=="1" (
 
 REM 5. Start backend in a new window
 echo [INFO] Starting backend FastAPI at http://%SERVER_IP%:%SERVER_PORT%
-start "Co Tuong Backend" cmd /k "cd /d ""%cd%"" && call venv\Scripts\activate.bat && python -m uvicorn main:app --host 0.0.0.0 --port %SERVER_PORT% --reload"
+start "Co Tuong Backend" cmd /k "cd /d ""%cd%"" && call venv\Scripts\activate.bat && python -m uvicorn main:app --host 0.0.0.0 --port %SERVER_PORT% --reload --timeout-graceful-shutdown 1"
 
 REM 6. Open frontend
 if exist "index.html" (
