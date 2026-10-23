@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poker Texas Hold'em Online - Chơi Bài & Quản Lý Chip</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=JetBrains+Mono:wght@600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+  <div class="app-container">
+    <!-- GLOBAL HEADER -->
+    <header class="main-header">
+      <div class="brand-area">
+        <div class="brand-badge">♠️</div>
+        <div>
+          <h1 class="brand-title">
+            Poker Texas Hold'em Online
+            <span class="brand-gold-tag">Realtime Casino</span>
+          </h1>
+        </div>
+      </div>
+
+      <div class="header-tools">
+        <button id="btnOpenRename" class="btn-tool" title="Đổi tên hiển thị & biểu tượng Avatar của bạn">
+          <span id="headerAvatarIcon">😎</span> <span id="headerPlayerNameLabel">Người chơi 1</span>
+        </button>
+        <button id="btnToggleTheme" class="btn-tool" title="Đổi giao diện Sáng / Tối">
+          <span id="themeIcon">☀️</span> <span id="themeLabel">Sáng</span>
+        </button>
+        <button id="btnToggleSound" class="btn-tool" title="Bật / Tắt âm thanh">
+          <span id="soundIcon">🔊</span> Âm thanh
+        </button>
+        <div class="connection-badge">
+          <span id="statusDot" class="status-dot"></span>
+          <span id="connectionStatus">Đang kết nối...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==============================================================
+         1. LOBBY SCREEN (CHỈ HIỂN THỊ PHÒNG & THÔNG TIN CHỜ VÀO CHƠI)
+         ============================================================== -->
+    <main id="lobbyScreen" class="view-screen">
+      <div class="lobby-grid">
+        <!-- Left: Player Profile & Room Creator -->
+        <section class="panel">
+          <h2>🃏 Thiết Lập & Vào Bàn</h2>
+
+          <div class="lobby-hero-card">
+            🔒 <b>Mỗi người chơi 1 màn hình bí mật:</b> Bài tẩy chỉ bạn nhìn thấy. Có đồng hồ đếm giờ tự động bỏ bài và tỷ lệ % thắng trực tiếp!
+          </div>
+
+          <div class="form-group">
+            <label for="playerNameInput">Tên người chơi & Biểu tượng của bạn:</label>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" id="btnLobbyAvatarPick" class="btn-secondary" style="font-size: 20px; padding: 0 12px;" title="Chọn Avatar">😎</button>
+              <input id="playerNameInput" type="text" maxlength="22" placeholder="Nhập tên của bạn..." value="Người chơi 1">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="form-group">
+              <label for="initBuyInInput">Vốn mang vào (Buy-in):</label>
+              <input id="initBuyInInput" type="number" step="1000" value="100000">
+            </div>
+            <div class="form-group">
+              <label for="initBlindSelect">Mức Blind (SB / BB):</label>
+              <select id="initBlindSelect">
+                <option value="10:20">10 / 20</option>
+                <option value="50:100">50 / 100</option>
+                <option value="500:1000">500 / 1,000</option>
+                <option value="1000:2000" selected>1,000 / 2,000</option>
+                <option value="2000:5000">2,000 / 5,000</option>
+                <option value="5000:10000">5,000 / 10,000</option>
+                <option value="10000:20000">10,000 / 20,000</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="controls-stack">
+            <button id="btnCreateRoom" class="btn-primary">
+              ➕ Tạo Phòng Mới (Chơi Cùng Bạn Bè)
+            </button>
+
+            <button id="btnCreateBotRoom" class="btn-bot" title="Chơi Poker ngay 1 mình cùng 3 Bot AI tự động thông minh">
+              🤖 Đấu Với Bot AI (1 Người + 3 Bot)
+            </button>
+
+            <button id="btnQuickMatch" class="btn-secondary">
+              ⚡ Ghép Bàn Nhanh (Phòng Ngẫu Nhiên)
+            </button>
+
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <input id="roomCodeInput" type="text" inputmode="numeric" maxlength="6" placeholder="Nhập mã phòng 6 số">
+              <button id="btnJoinRoom" class="btn-gold" style="white-space: nowrap; padding: 0 18px;">Vào Bàn</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right: Active Rooms Directory -->
+        <section class="panel">
+          <h2>
+            <span>🌐 Danh Sách Phòng Đang Mở</span>
+            <button id="btnRefreshRooms" class="btn-mini" title="Làm mới danh sách">🔄 Làm mới</button>
+          </h2>
+          <div id="roomListContainer" class="room-list-container">
+            <div style="text-align: center; color: var(--text-muted); padding: 24px; font-size: 13.5px; grid-column: 1 / -1;">
+              Đang tải danh sách phòng...
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- ==============================================================
+         2. IN-GAME SCREEN (KHI VÀO CHƠI MỚI HIỂN THỊ BÀN POKER)
+         ============================================================== -->
+    <main id="gameScreen" class="view-screen" style="display: none;">
+      <!-- In-Game Top Control & Room Info Bar -->
+      <div class="game-top-bar">
+        <div class="game-info-chips">
+          <div class="info-chip clickable" id="roomCodeChip" title="Bấm để sao chép mã phòng">
+            <span>Mã phòng:</span>
+            <strong class="mono" id="roomCodeDisplay" style="color: #fbbf24;">------</strong>
+            <span>📋</span>
+          </div>
+
+          <div class="info-chip">
+            <span>Blinds:</span>
+            <strong class="mono" id="blindsDisplay">1,000 / 2,000</strong>
+          </div>
+
+          <div class="info-chip">
+            <span>Ván số:</span>
+            <strong class="mono" id="handNumberDisplay">#0</strong>
+          </div>
+
+          <div class="info-chip">
+            <span>Tổng tiền bàn:</span>
+            <strong class="mono" id="totalTableChipsDisplay" style="color: #34d399;">0 VNĐ</strong>
+          </div>
+
+          <div class="info-chip" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.45);">
+            <span id="myIdentityText">👤 Bạn đang ngồi ghế #1</span>
+            <button type="button" id="btnRenameInRoom" class="btn-mini" style="margin-left: 4px;" title="Đổi tên hiển thị & Avatar">✏️</button>
+            <span id="myRoleBadge" style="font-weight: 800; color: #fbbf24; margin-left: 4px;"></span>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <button id="btnSitDownSelf" class="btn-gold" style="display: none; padding: 6px 14px; font-size: 13px;">
+            🪑 Ngồi Vào Bàn
+          </button>
+          <button id="btnAddBotQuick" class="btn-bot" style="display: none; padding: 6px 12px; font-size: 13px;">
+            🤖+ Thêm Bot
+          </button>
+          <button id="btnQuickRebuyNav" class="btn-tool highlight" title="Nạp thêm vốn (Rebuy)">
+            💰 Nạp Chip
+          </button>
+          <button id="btnOpenLedger" class="btn-tool" title="Sổ cái & Chốt tiền">
+            📊 Sổ Cái
+          </button>
+          <button id="btnOpenSettings" class="btn-tool" title="Cài đặt phòng (Chủ bàn)">
+            ⚙️ Cài Đặt
+          </button>
+          <button id="btnLeaveRoomNav" class="btn-tool danger" title="Rời khỏi bàn chơi về lại sảnh phòng">
+            🚪 Rời Bàn
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Game Grid: Table + Sidebar -->
+      <div class="game-main-layout">
+        <!-- Center Arena Column -->
+        <div style="display: flex; flex-direction: column;">
+          <!-- Street Steps Bar -->
+          <div class="street-bar">
+            <div class="street-steps">
+              <span class="street-pill active" data-street="idle">Chờ ván</span>
+              <span class="street-pill" data-street="preflop">1. Pre-Flop</span>
+              <span class="street-pill" data-street="flop">2. Flop (3 lá)</span>
+              <span class="street-pill" data-street="turn">3. Turn (4 lá)</span>
+              <span class="street-pill" data-street="river">4. River (5 lá)</span>
+              <span class="street-pill showdown" data-street="showdown">🏆 Showdown</span>
+            </div>
+            <div class="turn-indicator" id="turnStatusText">
+              Đang chờ chia bài
+            </div>
+          </div>
+
+          <!-- Oval Casino Poker Table Felt -->
+          <div class="poker-arena" id="pokerArena">
+            <div class="poker-table-felt">
+              <div class="table-center-hub">
+                <div class="pot-main-box">
+                  <div class="pot-label">TỔNG POT</div>
+                  <div class="pot-amount" id="centerPotAmount">0 VNĐ</div>
+                </div>
+
+                <div id="allInRunoutBanner" class="allin-runout-banner" style="display: none;">
+                  🔥 ALL-IN SHOWDOWN!
+                </div>
+
+                <div class="community-cards-row" id="communityCardsRow"></div>
+
+                <div id="showdownSummaryBanner" class="showdown-result-banner" style="display: none;"></div>
+
+                <div class="current-street-bet-pill" id="centerCurrentBetPill">
+                  Mức cược vòng này: <strong class="mono">0</strong>
+                </div>
+
+                <div class="side-pots-row" id="sidePotsContainer"></div>
+
+                <div class="center-cta-row" style="display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                  <button id="btnStartHandCenter" class="btn-gold" style="padding: 6px 18px; font-size: 13.5px;">
+                    ▶️ BẮT ĐẦU VÁN MỚI
+                  </button>
+                  <button id="btnReviewHandCenter" class="btn-secondary" style="padding: 6px 14px; font-size: 13px; display: none;">
+                    👁️ Xem Lại Ván Vừa Rồi
+                  </button>
+                </div>
+              </div>
+
+              <!-- 10 Seats Layer -->
+              <div id="tableSeatsLayer"></div>
+            </div>
+            <div id="reactionOverlay" style="position: absolute; inset: 0; pointer-events: none; overflow: hidden;"></div>
+          </div>
+
+          <!-- Betting Action Deck & Private Hole Cards -->
+          <div class="betting-deck" id="bettingDeck">
+            <div class="deck-turn-header">
+              <span id="actorNameBadge" class="actor-badge">Chưa trong vòng cược</span>
+              <span id="actorStackInfo" class="actor-stack"></span>
+            </div>
+
+            <!-- Timer Bar -->
+            <div id="deckTimerBox" class="deck-timer-box">
+              <div id="deckTimerBadge" class="deck-timer-badge">
+                <span>⏱️ LƯỢT BẠN:</span>
+                <span id="deckTimerSecText">20s</span>
+              </div>
+              <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.12); border-radius: 999px; overflow: hidden;">
+                <div id="deckTimerBarFill" class="seat-timer-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+
+            <!-- Private Hole Cards -->
+            <div class="my-hand-box" id="myHandBox">
+              <div class="my-hole-cards-wrap">
+                <div id="myDeckCardsContainer" style="display: flex; gap: 6px;"></div>
+                <div>
+                  <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);" id="myHandOwnerLabel">🔒 Bài tẩy của bạn:</div>
+                  <div style="font-size: 15px; font-weight: 900; color: #10b981;" id="myLiveHandRankText">Chưa chia bài</div>
+                  <div id="myDrawHintBadge" class="my-draw-hint-badge" style="display: none;"></div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                <button type="button" id="btnRevealCard0" class="btn-mini" title="Khoe riêng lá 1" disabled>🃏 Khoe lá 1</button>
+                <button type="button" id="btnRevealCard1" class="btn-mini" title="Khoe riêng lá 2" disabled>🃏 Khoe lá 2</button>
+                <button type="button" id="btnRevealMyCards" class="btn-mini" title="Khoe cả 2 lá bài tẩy" disabled>👀 Lật cả 2 lá</button>
+              </div>
+            </div>
+
+            <!-- Pre-Action Bar -->
+            <div id="preActionBar" class="pre-action-bar">
+              <span style="font-size: 11.5px; font-weight: 800; color: #38bdf8;">⚡ Tùy chọn sẵn:</span>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <button type="button" class="pre-action-btn" data-pre="check_fold">☑️ Xem / Bỏ bài</button>
+                <button type="button" class="pre-action-btn" data-pre="check">☑️ Xem (Check)</button>
+                <button type="button" class="pre-action-btn" data-pre="call_any">☑️ Theo (Call Any)</button>
+              </div>
+            </div>
+
+            <!-- Main Actions (Fold, Check/Call, Raise, All-in) -->
+            <div class="actions-main-grid">
+              <button id="btnActFold" class="btn-action fold" disabled>
+                <span class="main-txt">🏳️ FOLD</span>
+                <span class="sub-txt">Bỏ bài</span>
+              </button>
+
+              <button id="btnActCheckCall" class="btn-action check-call" disabled>
+                <span class="main-txt" id="lblCheckCall">✔️ CHECK</span>
+                <span class="sub-txt" id="subCheckCall">Xem (0)</span>
+              </button>
+
+              <button id="btnActRaise" class="btn-action raise" disabled>
+                <span class="main-txt" id="lblRaise">🚀 RAISE</span>
+                <span class="sub-txt" id="subRaise">Tố thêm</span>
+              </button>
+
+              <button id="btnActAllIn" class="btn-action all-in" disabled>
+                <span class="main-txt">🔥 ALL-IN</span>
+                <span class="sub-txt" id="subAllIn">Tất tay</span>
+              </button>
+            </div>
+
+            <!-- Raise Controls -->
+            <div class="raise-control-box">
+              <div class="raise-slider-row">
+                <input id="raiseSlider" class="raise-slider" type="range" min="2000" max="100000" step="1000" value="4000" disabled>
+                <input id="raiseNumberInput" class="raise-input" type="number" step="1000" value="4000" disabled>
+              </div>
+
+              <div class="preset-chips-row">
+                <button type="button" class="btn-preset" data-preset="min">Min</button>
+                <button type="button" class="btn-preset" data-preset="half">1/2 Pot</button>
+                <button type="button" class="btn-preset" data-preset="twothird">2/3 Pot</button>
+                <button type="button" class="btn-preset" data-preset="pot">Pot</button>
+                <button type="button" class="btn-preset" data-preset="max">Max</button>
+                <span id="minRaiseHintText" style="font-size: 11px; color: var(--text-muted); align-self: center; margin-left: auto;"></span>
+              </div>
+            </div>
+
+            <!-- Interactive Toolbar & Chat -->
+            <div class="interaction-bar">
+              <div class="prop-throw-group">
+                <span style="font-size: 11px; font-weight: 800; color: var(--text-muted);">Ném vui:</span>
+                <button type="button" class="prop-throw-btn" data-prop="🍺" title="Ném cốc bia">🍺</button>
+                <button type="button" class="prop-throw-btn" data-prop="☕" title="Mời cà phê">☕</button>
+                <button type="button" class="prop-throw-btn" data-prop="🌹" title="Tặng hoa hồng">🌹</button>
+                <button type="button" class="prop-throw-btn" data-prop="🍅" title="Ném cà chua">🍅</button>
+                <button type="button" class="prop-throw-btn" data-prop="💸" title="Tung tiền">💸</button>
+              </div>
+
+              <div class="chat-input-wrap">
+                <input id="chatTextInput" type="text" maxlength="60" placeholder="Chat nhanh...">
+                <button id="btnSendChat" class="btn-secondary" style="min-height: 38px; padding: 0 12px;">Gửi</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Players In-Room & Activity Logs -->
+        <aside style="display: flex; flex-direction: column; gap: 12px;">
+          <section class="panel">
+            <h2>
+              <span>👥 Người Chơi (<span id="playerCountLabel">0</span>/10)</span>
+            </h2>
+            <div id="sidebarPlayerList" class="player-list-sidebar"></div>
+          </section>
+
+          <section class="panel">
+            <h2>
+              <span>📜 Lịch Sử Ván Đấu</span>
+              <span id="logCountBadge" style="font-size: 11px; color: var(--text-muted);">0</span>
+            </h2>
+            <div id="handHistoryContainer" style="max-height: 220px; overflow-y: auto;"></div>
+            <div id="actionLogContainer" style="max-height: 180px; overflow-y: auto; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 8px;"></div>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <!-- ==============================================================
+       POPUP KẾT QUẢ VÁN ĐẤU (THẮNG / THUA & SẴN SÀNG)
+       ============================================================== -->
+  <div id="victoryModal" class="modal-backdrop">
+    <div class="modal-card victory-card" id="victoryCardNode">
+      <button type="button" id="btnCloseVictoryModal" class="victory-close-btn" onclick="closeVictoryPopup()" title="Đóng">✕</button>
+      <div id="victoryTrophyIcon" class="victory-trophy-icon">🏆</div>
+      <h3 id="victoryModalTitle" class="victory-title">BẠN ĐÃ CHIẾN THẮNG!</h3>
+      <div id="victoryPotAmount" class="victory-pot-amount win">+0 VNĐ</div>
+      <div>
+        <span id="victoryHandBadge" class="victory-hand-badge">🃏 Thắng Pot</span>
+      </div>
+      <div id="victoryNetDelta" class="victory-net-delta">Lời ròng: +0 VNĐ</div>
+
+      <!-- Action group: Sẵn sàng chơi tiếp & Xem lại ván -->
+      <div class="victory-action-group">
+        <button type="button" id="btnVictoryPlayAgain" class="btn-play-again-main">
+          ▶️ SẴN SÀNG CHƠI TIẾP
+        </button>
+        <button type="button" id="btnOpenHandReview" class="btn-review-hand-secondary">
+          👁️ Xem Lại Ván Vừa Rồi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================================
+       MODAL: XEM LẠI CHI TIẾT VÁN ĐẤU (HAND REVIEW MODAL)
+       ============================================================== -->
+  <div id="handReviewModal" class="modal-backdrop">
+    <div class="modal-card hand-review-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border-color);">
+        <h3 id="handReviewTitle" style="font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+          <span>📋</span> <span id="handReviewHeaderTxt">Chi Tiết Ván Đấu</span>
+        </h3>
+        <button type="button" id="btnCloseHandReview" class="btn-tool" onclick="closeHandReviewModal()" title="Đóng">✕</button>
+      </div>
+
+      <div class="hand-review-body">
+        <!-- Community cards on table -->
+        <div class="hand-review-board-box">
+          <div style="font-size: 13px; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">🃏 5 Lá Bài Chung:</div>
+          <div id="reviewBoardCards" class="review-cards-row"></div>
+          <div id="reviewReason" class="review-reason-text"></div>
+        </div>
+
+        <!-- Winners Section -->
+        <div class="review-section">
+          <div class="review-section-title" style="color: #34d399;">🏆 Người Thắng Pot</div>
+          <div id="reviewWinnersList" class="review-player-list"></div>
+        </div>
+
+        <!-- Losers Section -->
+        <div class="review-section">
+          <div class="review-section-title" style="color: #ef4444;">💔 Người Thua / Đã Fold</div>
+          <div id="reviewLosersList" class="review-player-list"></div>
+        </div>
+      </div>
+
+      <div class="hand-review-footer">
+        <button type="button" id="btnCloseHandReviewFooter" class="btn-secondary">Đóng</button>
+        <button type="button" id="btnHandReviewReady" class="btn-primary">▶️ Sẵn Sàng Ván Mới</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RENAME & AVATAR PICKER -->
+  <div id="renamePlayerModal" class="modal-backdrop">
+    <div class="modal-card" style="width: min(400px, 100%);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="font-size: 16px; font-weight: 800;">✏️ Đổi Tên & Avatar Của Bạn</h3>
+        <button id="btnCloseRenameModal" class="btn-tool">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label for="modalPlayerNameInput">Tên người chơi:</label>
+        <input id="modalPlayerNameInput" type="text" maxlength="22" placeholder="Nhập tên mới...">
+      </div>
+
+      <div class="form-group">
+        <label>Chọn biểu tượng Avatar đại diện:</label>
+        <div id="modalAvatarGrid" class="avatar-grid"></div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+        <button id="btnCancelRenameModal" class="btn-secondary">Hủy</button>
+        <button id="btnSaveRenameModal" class="btn-primary">Lưu Thay Đổi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LEDGER & REBUY -->
+  <div id="ledgerModal" class="modal-backdrop">
+    <div class="modal-card" style="width: min(620px, 100%);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="font-size: 16px; font-weight: 800;">💰 Sổ Cái & Nạp Thêm Tiền</h3>
+        <button id="btnCloseLedgerModal" class="btn-tool">✕</button>
+      </div>
+
+      <div style="display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+        <button class="tab-btn active" data-tab="tabOverview">Tổng Quan Số Dư</button>
+        <button class="tab-btn" data-tab="tabRebuy">➕ Nạp Thêm (Rebuy)</button>
+        <button class="tab-btn" data-tab="tabTransfer">💸 Chuyển Khoản Chip</button>
+      </div>
+
+      <!-- Tab: Overview -->
+      <div id="tabOverview" class="ledger-tab-pane">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+              <th style="padding: 6px;">Người chơi</th>
+              <th style="padding: 6px;">Vốn nạp</th>
+              <th style="padding: 6px;">Hiện có</th>
+              <th style="padding: 6px;">Lời/Lỗ</th>
+              <th style="padding: 6px;">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerOverviewBody"></tbody>
+        </table>
+
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border-color);">
+          <div style="font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px;">GỢI Ý THANH TOÁN CUỐI BUỔI:</div>
+          <div id="settlementListContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+      </div>
+
+      <!-- Tab: Rebuy -->
+      <div id="tabRebuy" class="ledger-tab-pane" style="display: none;">
+        <div class="form-group">
+          <label for="rebuyPlayerSelect">Người chơi cần nạp thêm:</label>
+          <select id="rebuyPlayerSelect"></select>
+        </div>
+
+        <div class="form-group">
+          <label for="rebuyAmountInput">Số tiền nạp thêm (VNĐ):</label>
+          <input id="rebuyAmountInput" type="number" step="10000" value="100000">
+        </div>
+
+        <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+          <button type="button" class="btn-preset rebuy-quick-btn" data-amt="50000">+50K</button>
+          <button type="button" class="btn-preset rebuy-quick-btn" data-amt="100000">+100K</button>
+          <button type="button" class="btn-preset rebuy-quick-btn" data-amt="200000">+200K</button>
+          <button type="button" class="btn-preset rebuy-quick-btn" data-amt="500000">+500K</button>
+        </div>
+
+        <button id="btnConfirmRebuy" class="btn-gold" style="width: 100%;">
+          💳 Xác Nhận Nạp Tiền
+        </button>
+
+        <div id="hostAdjustBox" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color); display: none;">
+          <div style="font-size: 12px; font-weight: 800; color: #f59e0b; margin-bottom: 6px;">🔧 Quyền Chủ Bàn: Điều Chỉnh Stack Thủ Công</div>
+          <div style="display: flex; gap: 8px;">
+            <input id="adjustStackInput" type="number" step="1000" placeholder="Số dư mới...">
+            <button id="btnConfirmAdjustStack" class="btn-secondary" style="white-space: nowrap;">Cập nhật</button>
+          </div>
+          <label style="font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; margin-top: 4px;">
+            <input id="adjustUpdateBuyInCheck" type="checkbox" checked> Đồng thời tính vào Vốn nạp (Buy-in)
+          </label>
+        </div>
+      </div>
+
+      <!-- Tab: Transfer -->
+      <div id="tabTransfer" class="ledger-tab-pane" style="display: none;">
+        <div class="form-group">
+          <label for="transferFromSelect">Từ người chơi:</label>
+          <select id="transferFromSelect"></select>
+        </div>
+        <div class="form-group">
+          <label for="transferToSelect">Đến người chơi:</label>
+          <select id="transferToSelect"></select>
+        </div>
+        <div class="form-group">
+          <label for="transferAmountInput">Số tiền chuyển (VNĐ):</label>
+          <input id="transferAmountInput" type="number" step="1000" value="20000">
+        </div>
+        <div class="form-group">
+          <label for="transferNoteInput">Ghi chú (tuỳ chọn):</label>
+          <input id="transferNoteInput" type="text" placeholder="Lý do chuyển...">
+        </div>
+        <button id="btnConfirmTransfer" class="btn-primary" style="width: 100%;">
+          💸 Chuyển Tiền
+        </button>
+      </div>
+
+      <div id="ledgerAuditContainer" style="display: none;"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: TABLE SETTINGS -->
+  <div id="settingsModal" class="modal-backdrop">
+    <div class="modal-card" style="width: min(500px, 100%);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="font-size: 16px; font-weight: 800;">⚙️ Cấu Hình Bàn Poker (Chủ Bàn)</h3>
+        <button id="btnCloseSettingsModal" class="btn-tool">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>Chọn nhanh mức Blind:</label>
+        <div class="preset-chips-row">
+          <button type="button" class="btn-preset blind-preset-btn" data-sb="10" data-bb="20" data-buyin="1000">10/20</button>
+          <button type="button" class="btn-preset blind-preset-btn" data-sb="50" data-bb="100" data-buyin="5000">50/100</button>
+          <button type="button" class="btn-preset blind-preset-btn" data-sb="500" data-bb="1000" data-buyin="50000">500/1K</button>
+          <button type="button" class="btn-preset blind-preset-btn" data-sb="1000" data-bb="2000" data-buyin="100000">1K/2K</button>
+          <button type="button" class="btn-preset blind-preset-btn" data-sb="2000" data-bb="5000" data-buyin="200000">2K/5K</button>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div class="form-group">
+          <label for="setSmallBlind">Small Blind (SB):</label>
+          <input id="setSmallBlind" type="number" min="1" step="100" value="1000">
+        </div>
+        <div class="form-group">
+          <label for="setBigBlind">Big Blind (BB):</label>
+          <input id="setBigBlind" type="number" min="1" step="100" value="2000">
+        </div>
+        <div class="form-group">
+          <label for="setAnte">Ante:</label>
+          <input id="setAnte" type="number" min="0" step="100" value="0">
+        </div>
+        <div class="form-group">
+          <label for="setDefaultBuyIn">Buy-in mặc định:</label>
+          <input id="setDefaultBuyIn" type="number" min="100" step="1000" value="100000">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div class="form-group">
+          <label for="setTurnTimeout">⏱️ Thời gian đếm giờ:</label>
+          <select id="setTurnTimeout">
+            <option value="10">10 giây (Nhanh)</option>
+            <option value="15">15 giây</option>
+            <option value="20" selected>20 giây (Chuẩn)</option>
+            <option value="30">30 giây</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="setCurrency">Đơn vị hiển thị:</label>
+          <select id="setCurrency">
+            <option value="VNĐ">VNĐ</option>
+            <option value="Chip">Chip</option>
+            <option value="$">$ (USD)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+        <button id="btnCancelSettings" class="btn-secondary">Đóng</button>
+        <button id="btnSaveSettings" class="btn-primary">💾 Lưu Cấu Hình</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Đã sao chép!</div>
+
+  <!-- SCRIPT -->
+  <script src="app.js"></script>
+</body>
+</html>
